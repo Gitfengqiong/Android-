@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<TabHost xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@android:id/tabhost">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@mipmap/searh">
+        <TabWidget
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@android:id/tabs"></TabWidget>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:id="@android:id/tabcontent">
+                <!--定义内容-->
+                <LinearLayout
+                    android:id="@+id/Tab1v"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+                    <TextView
+                    android:layout_columnWeight="4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="In"
+                    android:textSize="30dp"
+                    android:textAlignment="center"
+                    android:layout_gravity="center"
+                        android:textColor="#00ff11"/>
+                    <ScrollView
+                        android:id="@+id/scr"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:layout_height="match_parent"
+                        android:layout_centerVertical="true"
+                        android:layout_centerHorizontal="true"
+
+                        >
+
+                    <GridLayout
+                       android:id="@+id/Tab1in"
+                      android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:columnCount="4"
+                        android:padding="5dp"
+                        android:layout_gravity="fill"
+                        >
+
+                        <!--
+                        <Button
+                            android:layout_height="wrap_content"
+                            android:height="200dp"
+                            android:layout_columnWeight="1"
+                           />
+                        <Button
+                            android:layout_height="wrap_content"
+                            android:height="200dp"
+                            android:layout_columnWeight="1"
+                            />
+                        <Button
+                            android:layout_height="wrap_content"
+                            android:height="200dp"
+                            android:layout_columnWeight="1"/>
+                        <Button
+                            android:layout_height="wrap_content"
+                            android:height="200dp"
+                            android:layout_columnWeight="1"/>
+                        <Button
+                            android:layout_height="wrap_content"
+                            android:height="200dp"
+                            android:layout_columnWeight="1"/>-->
+
+                    </GridLayout>
+                    </ScrollView>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Out"
+                        android:textSize="20dp"
+                        android:textAlignment="center"
+                        android:layout_gravity="center"
+                        android:textColor="#ff0011"/>
+                    <ScrollView
+                        android:id="@+id/scr1"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:layout_weight="1">
+
+                        <GridLayout
+                            android:id="@+id/Tab1out"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:columnCount="4"
+                            android:layout_gravity="fill"
+                            android:padding="5dp">
+
+
+                        </GridLayout>
+                    </ScrollView>
+                </LinearLayout>
+
+                <GridLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/Tab2v"
+                  ></GridLayout>
+            </FrameLayout>
+
+    </LinearLayout>
+
+</TabHost>
+
