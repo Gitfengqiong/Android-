@@ -39,4 +39,5 @@
         <item>57600</item>
         <item>115200</item>
     </string-array>
+    <string name="ask">asd</string>
 </resources>
