@@ -285,7 +285,7 @@ public class MainActivity extends Activity {
                 Intent intent = new Intent(MainActivity.this, SetingActivtiy.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
-                podia.dismiss();
+//                podia.dismiss();
 
             }
     };
@@ -319,12 +319,19 @@ public class MainActivity extends Activity {
         if(ipin.getText().toString().isEmpty()){
             Toast toast = Toast.makeText(this,"请输入地址",Toast.LENGTH_SHORT);
             toast.show();
+            /***********
+             * Debug to SetingActivtiy Codes*
+             */
         //    ipIndex = 0 ;
-         //  String data ="effe01100014970f1ee0c0a801c8e0000029c0a8011ac0a80101ffffff00e40fe50f02080150472d4345004f53440031323300570000202000000000" +
+         //   String data ="effe01100014970f1ee0c0a801c8e0000029c0a8011ac0a80101ffffff00e40fe50f02080150472d4345004f53440031323300570000202000000000" +
           //          "effe01100014970f1ef0c0b801c8e0000029c0a8011ac0a80101ffffff00e40fe50f02080150472d4345004f53440031323300570000202000000000";
          //   int num =ParseCode.ParseMultiCodes(data);
           //  Log.d("find ip",iPlist[ipIndex-1].m_HostPort);
           //  CreateListView();
+          //  String s= "BA0103A001130F0F7D";
+           // ParseCode.Parsecode(s);
+          //  vdate.LoginOk =true;
+          //  runhandler.post(runui);
 
         }else //跳转到设置页
             if(ipin.getText().toString().length() <7){

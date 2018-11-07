@@ -12,8 +12,10 @@ import android.os.Vibrator;
 import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.TabHost;
@@ -21,6 +23,8 @@ import android.widget.TabHost.TabSpec;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
+
+import static android.widget.GridLayout.spec;
 
 //import static com.example.administrator.muitleconter.MainActivity.Internets;
 
@@ -44,7 +48,7 @@ public class SetingActivtiy extends TabActivity {
         TabHost gettab = getTabHost();
         TabSpec sp = gettab.newTabSpec("tab1").setIndicator("视频布局").setContent(R.id.Tab1v);
         gettab.addTab(sp);
-        TabSpec sp1 = gettab.newTabSpec("tab2").setIndicator("设备设置").setContent(R.id.Tab2v);
+        TabSpec sp1 = gettab.newTabSpec("tab2").setIndicator("场景设置").setContent(R.id.Tab2v);
         gettab.addTab(sp1);
         id = (GridLayout) findViewById(R.id.Tab1in);
         ido = (GridLayout) findViewById(R.id.Tab1out);
@@ -128,17 +132,19 @@ public class SetingActivtiy extends TabActivity {
     public void Createview(int insum, int outsum ){
 
         for (int i = 0; i < insum; i++) {
-            final   Button is = new Mybutton(this);
+            final   Button is = new Mybutton(getBaseContext());
             is.setText(i+1+"");
-            @android.support.annotation.IdRes int ids =View.generateViewId() ;
+            @android.support.annotation.IdRes int ids =600+i ;
             is.setId(ids);
+            ((Mybutton) is).SetButtonid(ids);
             ((Mybutton) is).setMyId(i+1);
-            GridLayout.LayoutParams param= new GridLayout.LayoutParams(GridLayout.spec(
+            GridLayout.LayoutParams param= new GridLayout.LayoutParams(spec(
                     GridLayout.UNDEFINED,GridLayout.FILL,1f),
-                    GridLayout.spec(GridLayout.UNDEFINED,GridLayout.FILL,1f));
+                    spec(GridLayout.UNDEFINED,GridLayout.FILL,1f));
             param.setMargins(3,3,3,3);
             is.setLayoutParams(param);
             is.setHeight(200);
+            is.setTextSize(30);
             is.setBackgroundColor(Color.parseColor("#ff1111"));
             is.setOnClickListener(new View.OnClickListener() {
                                       @Override
@@ -163,18 +169,22 @@ public class SetingActivtiy extends TabActivity {
         }
 
         for (int i = 0; i < outsum; i++) {
-            final Button is1 = new Mybutton(this);
+            final Button is1 = new Mybutton(getBaseContext());
             is1.setText(i+1+"");
-            @android.support.annotation.IdRes int ids = View.generateViewId();
+           // @android.support.annotation.IdRes int ids = View.generateViewId();
+            @android.support.annotation.IdRes int ids = 800+i;
+            ((Mybutton) is1).SetButtonid(ids);
             is1.setId(ids);
             ((Mybutton) is1).setMyId(i+1);
-            GridLayout.LayoutParams param= new GridLayout.LayoutParams(GridLayout.spec(
+            GridLayout.LayoutParams param= new GridLayout.LayoutParams(spec(
                     GridLayout.UNDEFINED,GridLayout.FILL,1f),
-                    GridLayout.spec(GridLayout.UNDEFINED,GridLayout.FILL,1f));
+                    spec(GridLayout.UNDEFINED,GridLayout.FILL,1f));
             param.setMargins(3,3,3,3);
             is1.setLayoutParams(param);
+            is1.setTextSize(30);
             is1.setHeight(200);
             is1.setBackgroundColor(Color.parseColor("#ff1111"));
+           // is1.setTextAlignment();
             is1.setOnClickListener(new View.OnClickListener() {
                                        @Override
                                        public void onClick(View v) {
