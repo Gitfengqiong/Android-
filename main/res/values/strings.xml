@@ -18,7 +18,7 @@
     <string name="Ncode_Order_SceneGet">15</string>
     <string name="Ncode_Order_SceneSave">11</string>
     <string name="Ncode_Order_SceneLoop">19</string>
-    <string name="Ncode_Order_SceneLoop_on">11</string>
+    <string name="Ncode_Order_SceneLoop_on">1A</string>
     <string name="Ncode_Order_SceneLoop_Timer">1B</string>
     <string name="Ncode_Order_GetSYS">BA01140200D1</string>
     <string name="Ncode_FindDev">EFFE01010000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000</string>

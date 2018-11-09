@@ -328,10 +328,10 @@ public class MainActivity extends Activity {
          //   int num =ParseCode.ParseMultiCodes(data);
           //  Log.d("find ip",iPlist[ipIndex-1].m_HostPort);
           //  CreateListView();
-          //  String s= "BA0103A001130F0F7D";
-           // ParseCode.Parsecode(s);
-          //  vdate.LoginOk =true;
-          //  runhandler.post(runui);
+            String s= "BA0103A001130F0F7D";
+            ParseCode.Parsecode(s);
+            vdate.LoginOk =true;
+           runhandler.post(runui);
 
         }else //跳转到设置页
             if(ipin.getText().toString().length() <7){

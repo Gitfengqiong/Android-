@@ -26,7 +26,7 @@
                     android:layout_columnWeight="4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="In"
+                    android:text="IN"
                     android:textSize="30dp"
                     android:textAlignment="center"
                     android:layout_gravity="center"
@@ -80,11 +80,11 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Out"
+                        android:text="OUT"
                         android:textSize="20dp"
                         android:textAlignment="center"
                         android:layout_gravity="center"
-                        android:textColor="#ff0011"/>
+                        android:textColor="#00ff11"/>
 
                     <ScrollView
                         android:id="@+id/scr1"
@@ -98,11 +98,9 @@
                             android:id="@+id/Tab1out"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:layout_gravity="fill"
+                            android:layout_gravity="center"
                             android:columnCount="4"
                             android:padding="5dp">
-
-
                         </GridLayout>
                     </ScrollView>
                 </LinearLayout>
@@ -111,11 +109,15 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/Tab2v"
-                    android:orientation="horizontal">
+                    android:background="@color/colorlvBtn"
+                    android:orientation="vertical">
                     <LinearLayout
-                        android:layout_width="0dp"
+
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:layout_height="30dp"
+                        android:background="@color/colorPrimary"
+                        android:layout_gravity="top"
                         >
                         <TextView
                             android:layout_width="0dp"
@@ -123,36 +125,53 @@
                             android:layout_height="match_parent"
                             android:text="保存场景"/>
                         <Spinner
+                            android:id="@+id/SaveScene"
                             android:layout_width="0dp"
                             android:layout_weight="2.67"
-                            android:layout_height="match_parent"></Spinner>
+                            android:layout_height="match_parent"
+                            android:textAlignment="center"></Spinner>
                         <TextView
                             android:layout_width="0dp"
                             android:layout_weight="1"
                             android:layout_height="match_parent"
                             android:text="调用场景"/>
                         <Spinner
+                            android:id="@+id/CallScene"
                             android:layout_width="0dp"
                             android:layout_weight="2.67"
                             android:layout_height="match_parent"></Spinner>
                     </LinearLayout>
                     <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_weight="2.67"
-                        android:layout_height="match_parent">
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="6.67"
+                        android:background="@color/colorPrimaryDark1"
+                        android:layout_gravity="center"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:textAlignment="center"
+                            android:layout_gravity="center_horizontal"
+                            android:text=" Scene Loop "
+                            android:textColor="@color/colorlvBtn"
+                            android:textSize="30sp"
+                            android:background="@color/colorPrimary"/>
                     <ScrollView
                         android:id="@+id/w"
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="10"
                         android:layout_centerVertical="true"
                         android:layout_centerHorizontal="true"
 
                         >
                         <GridLayout
-                            android:id="@+id/Scrv"
+                            android:id="@+id/Scenel"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:columnCount="4"
+                            android:columnCount="8"
                             android:padding="5dp"
                             android:layout_gravity="fill"
                             >
@@ -185,10 +204,55 @@
                     </ScrollView>
                     </LinearLayout>
                     <LinearLayout
-                        android:layout_width="0dp"
+                        android:layout_width="match_parent"
+                        android:layout_gravity="bottom"
+                        android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:layout_height="match_parent">
+                        android:background="@color/colorAccent">
+                        <Button
+                            android:layout_width="0dp"
+                            android:layout_weight="0.5"
+                            android:layout_height="match_parent"
+                            android:onClick="SceneStart"
+                            android:text="Start"
+                            android:textAlignment="center"/>
 
+                        <Button
+                            android:layout_width="0dp"
+                            android:layout_weight="0.5"
+                            android:layout_height="match_parent"
+                            android:onClick="SceneStop"
+                            android:text="Stop"
+                            android:textAlignment="center"/>
+                        <SeekBar
+                            android:id="@+id/progress"
+                            android:layout_width="0dp"
+                            android:layout_weight="2.67"
+                            android:layout_height="wrap_content"
+                            android:maxHeight="12dp"
+                            android:minHeight="12dp"
+                            android:paddingBottom="3dp"
+                            android:paddingLeft="12dp"
+                            android:max="254"
+                            android:progress="0"
+                            android:paddingRight="12dp"
+                            android:paddingTop="3dp"
+                            android:progressDrawable="@drawable/layer_progress"
+                            android:thumb="@drawable/shape_circle"
+                            android:layout_gravity="center_vertical"/>
+
+                        <TextView
+                            android:id="@+id/text1"
+                            android:layout_width="0dp"
+                            android:layout_weight="1"
+                            android:layout_height="match_parent"
+                            android:gravity="center_horizontal"
+                            android:padding="6dp"
+                            android:text="Timer:UDF"
+                            android:textColor="#16BC5C"
+                            android:textSize="16dp"
+                            android:textAlignment="center"
+                            android:layout_gravity="center_horizontal"/>
                     </LinearLayout>
 
                 </LinearLayout>

@@ -12,17 +12,25 @@ import android.os.Vibrator;
 import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
+import android.telecom.Call;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.SeekBar;
+import android.widget.Spinner;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.widget.GridLayout.spec;
 
@@ -34,11 +42,13 @@ public class SetingActivtiy extends TabActivity {
     private Vibrator vibrator ;
     private GridLayout id;
     private  GridLayout ido;
+    private GridLayout Scenel;
    // private  MyUdpIo Internets ;
     private Message msg;
     protected static final int Msid1 = 0x130;
     protected static final int Mrid1 = 0x140;
     protected static MyUdpIo Internets ;
+
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
@@ -52,6 +62,7 @@ public class SetingActivtiy extends TabActivity {
         gettab.addTab(sp1);
         id = (GridLayout) findViewById(R.id.Tab1in);
         ido = (GridLayout) findViewById(R.id.Tab1out);
+        Scenel = findViewById(R.id.Scenel);
          VData Datas = (VData)getApplication();
         Datas.setInClikeoff(false);
         Datas.setSetInOk(false);
@@ -59,8 +70,137 @@ public class SetingActivtiy extends TabActivity {
         Datas.ReCode = "00";
         vdata =Datas;
         Createview(vdata.inleng,vdata.outleng);
+        CreateScene(vdata.Scenenum);
+       SeekBar seekBar = (SeekBar) findViewById(R.id.progress);
+       final TextView textView = (TextView) findViewById(R.id.text1);
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            private int time ;
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // 当拖动条的滑块位置发生改变时触发该方法,在这里直接使用参数progress，即当前滑块代表的进度值
+                time = progress+1 ;
+                textView.setText("Timer:" + Integer.toString(time)+"S");
+            }
 
-       MyHandler handler = new MyHandler(this);
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+               // Log.e("------------", "开始滑动！");
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                //Log.e("------------", "停止滑动！"+time);
+                StringBuffer codes ;
+                codes =new StringBuffer();
+                codes.append(getBaseContext().getResources().getString(R.string.Ncode_Begin));
+                codes.append(vdata.devaddrid);
+                codes.append(getBaseContext().getResources().getString(R.string.Ncode_Order_SceneLoop_Timer));
+                codes.append("03");
+                codes.append("00");
+                if (time <16){
+                    String hexnum = Integer.toString(time,16);
+                    codes.append("0");
+                    codes.append(hexnum);
+                }else if ( time >15){
+                    String hexnum = Integer.toString(time,16);
+                    codes.append(hexnum);
+                }
+                codes.append("00");
+                SendCodes(codes.toString());//Stop Scene Lopper
+                Log.d("Timer::",codes.toString());
+            }
+        });
+
+        Spinner Savelist  = findViewById(R.id.SaveScene);
+        Spinner Calllist = findViewById(R.id.CallScene);
+        List<String> Scenelist  = new ArrayList<String>();
+        for (int i=1 ;i<=vdata.Scenenum; i++){
+            Scenelist.add("场景"+String.valueOf(i));
+        }
+        ArrayAdapter<String> adapter;
+        adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, Scenelist);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Savelist.setAdapter(adapter);
+        Calllist.setAdapter(adapter);
+        final boolean[] first = {true};
+        Savelist.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                if (first[0]){
+                    view.setVisibility(View.INVISIBLE);
+                }
+                position+=1;
+                StringBuffer codes ;
+                String leng = "03";
+                codes=new StringBuffer();
+                codes.append(getBaseContext().getResources().getString(R.string.Ncode_Begin));
+                codes.append(vdata.devaddrid);
+                codes.append(getBaseContext().getResources().getString(R.string.Ncode_Order_SceneSave));
+                codes.append(leng);
+                codes.append("00");
+                if (position <16){
+                    String hexnum = Integer.toString(position,16);
+                    codes.append("0");
+                    codes.append(hexnum);
+                }else if ( position >15){
+                    String hexnum = Integer.toString(position,16);
+                    codes.append(hexnum);
+                }
+                codes.append("00");
+                Log.d("Save Scence:",codes.toString());
+                SendCodes(codes.toString());//Set Scene
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
+        Calllist.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view,
+                                       int position, long id) {
+                    if (first[0]){
+                        view.setVisibility(View.INVISIBLE);
+                    }
+                    first[0] =false ;
+                position+=1;
+                StringBuffer codes ;
+                String leng = "03";
+                codes=new StringBuffer();
+                codes.append(getBaseContext().getResources().getString(R.string.Ncode_Begin));
+                codes.append(vdata.devaddrid);
+                codes.append(getBaseContext().getResources().getString(R.string.Ncode_Order_SceneGet));
+                codes.append(leng);
+                codes.append("00");
+                if (position <16){
+                    String hexnum = Integer.toString(position,16);
+                    codes.append("0");
+                    codes.append(hexnum);
+                }else if ( position >15){
+                    String hexnum = Integer.toString(position,16);
+                    codes.append(hexnum);
+                }
+                codes.append("00");
+                Log.d("Call Scence:",codes.toString());
+                SendCodes(codes.toString());//Call Scene
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // TODO Auto-generated method stub
+
+            }
+        });
+
+        MyHandler handler = new MyHandler(this);
        Internets = new MyUdpIo(handler,vdata.Thisip,Mrid1,Msid1);
        new Thread(Internets).start();
         vibrator = (Vibrator)this.getSystemService(this.VIBRATOR_SERVICE);
@@ -88,6 +228,7 @@ public class SetingActivtiy extends TabActivity {
                 }
             }
         }).start();
+
 
     }
 
@@ -132,7 +273,7 @@ public class SetingActivtiy extends TabActivity {
     public void Createview(int insum, int outsum ){
 
         for (int i = 0; i < insum; i++) {
-            final   Button is = new Mybutton(getBaseContext());
+            final   Mybutton is = new Mybutton(getBaseContext());
             is.setText(i+1+"");
             @android.support.annotation.IdRes int ids =600+i ;
             is.setId(ids);
@@ -169,7 +310,7 @@ public class SetingActivtiy extends TabActivity {
         }
 
         for (int i = 0; i < outsum; i++) {
-            final Button is1 = new Mybutton(getBaseContext());
+            final Mybutton is1 = new Mybutton(getBaseContext());
             is1.setText(i+1+"");
            // @android.support.annotation.IdRes int ids = View.generateViewId();
             @android.support.annotation.IdRes int ids = 800+i;
@@ -198,6 +339,185 @@ public class SetingActivtiy extends TabActivity {
             ido.addView(is1);
         }
     }
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    public void CreateScene(int insum) {
+
+        for (int i = 0; i < insum; i++) {
+            final SceneButton is = new SceneButton(getBaseContext());
+            is.setText(i + 1 + "");
+            @android.support.annotation.IdRes int ids = 1000 + i;
+            is.setId(ids);
+            is.id = i+1;
+            GridLayout.LayoutParams param = new GridLayout.LayoutParams(spec(
+                    GridLayout.UNDEFINED, GridLayout.FILL, 1f),
+                    spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f));
+            param.setMargins(3, 3, 3, 3);
+            is.setLayoutParams(param);
+            is.setHeight(200);
+            is.setTextSize(30);
+            is.setBackgroundColor(Color.parseColor("#ff1111"));
+            is.setOnClickListener(new View.OnClickListener() {
+                                      @Override
+                                      public void onClick(View v) {
+                                          vibrator.vibrate(70);
+                                           is.Clickstart(vdata );
+                                      }
+                                  }
+            );
+            Scenel.addView(is);
+
+        }
+    }
+
+    public void SceneStart(View view){
+        vdata.SceneStart = true ;
+        int Snum = vdata.Scenenum ;
+        vibrator.vibrate(70);
+        int d1=0 , d2=0;
+        for (int i=0 ; i<Snum ; i++){
+            SceneButton isscen = findViewById(1000+i);
+
+            if (isscen.Onstatu ){
+                if (isscen.id <9){
+                    switch (isscen.id){
+                        case 1 : {
+                            d1 = d1 | 0x00000001;
+                            continue;
+                        }
+                        case 2:{
+                            d1 = d1 | 0x00000002;
+                            continue;
+                        }
+                        case 3:{
+                            d1 = d1 | 0x00000004;
+                            continue;
+                        }
+                        case 4:{
+                            d1 = d1 | 0x00000008;
+                            continue;
+                        }
+                        case 5:{
+                            d1 = d1 | 0x00000010;
+                            continue;
+                        }
+                        case 6:{
+                            d1 = d1 | 0x00000020;
+                            continue;
+                        }
+                        case 7:{
+                            d1 = d1 | 0x00000040;
+                            continue;
+                        }
+                        case 8:{
+                            d1 = d1 | 0x00000080;
+                            continue;
+                        }
+                    }
+                    }
+                if (isscen.id <17){
+                    switch (isscen.id){
+                        case 9 : {
+                            d2 = d2 | 0x00000001;
+                            continue;
+                        }
+                        case 10:{
+                            d2 = d2 | 0x00000002;
+                            continue;
+                        }
+                        case 11:{
+                            d2 = d2 | 0x00000004;
+                            continue;
+                        }
+                        case 12:{
+                            d2 = d2 | 0x00000008;
+                            continue;
+                        }
+                        case 13:{
+                            d2 = d2 | 0x00000010;
+                            continue;
+                        }
+                        case 14:{
+                            d2 = d2 | 0x00000020;
+                            continue;
+                        }
+                        case 15:{
+                            d2 = d2 | 0x00000040;
+                            continue;
+                        }
+                        case 16:{
+                            d2 = d2 | 0x00000080;
+                            continue;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        StringBuffer codes ;
+        String leng = "04";
+        codes=new StringBuffer();
+        codes.append(this.getResources().getString(R.string.Ncode_Begin));
+        codes.append(vdata.devaddrid);
+        codes.append(this.getResources().getString(R.string.Ncode_Order_SceneLoop));
+        codes.append(leng);
+        codes.append("00");
+        if (d2 <16){
+            String hexnum = Integer.toString(d2,16);
+            codes.append("0");
+            codes.append(hexnum);
+        }else if ( d2 >15){
+            String hexnum = Integer.toString(d2,16);
+            codes.append(hexnum);
+        }
+        if (d1 <16){
+            String hexnum1 = Integer.toString(d1,16);
+            codes.append("0");
+            codes.append(hexnum1);
+        }else if (d1 >15) {
+            String hexnum1 = Integer.toString(d1, 16);
+            codes.append(hexnum1);
+        }
+
+        codes.append("00");
+        Log.d("Scence:",codes.toString());
+        SendCodes(codes.toString());//Set Scene Lopper Number
+        codes.delete(0,codes.length());
+        codes.append(this.getResources().getString(R.string.Ncode_Begin));
+        codes.append(vdata.devaddrid);
+        codes.append(this.getResources().getString(R.string.Ncode_Order_SceneLoop_on));
+        codes.append("03");
+        codes.append("000000");
+        SendCodes(codes.toString());//Start Scene Lopper
+        vdata.SceneStart =true ;
+
+    }
+    public static   void SendCodes(String codes){
+
+     //   Log.d("getip::",Internets.getIp());
+        try {
+            Message msg = new Message();
+            msg.what = Msid1;
+            msg.obj = codes;
+            assert (Internets.rehandler != null);
+
+            Internets.rehandler.sendMessage(msg);
+        }catch (Exception e){e.printStackTrace();}
+
+    }
+    public  void  SceneStop(View view){
+        StringBuffer codes ;
+        codes =new StringBuffer();
+        codes.append(this.getResources().getString(R.string.Ncode_Begin));
+        codes.append(vdata.devaddrid);
+        codes.append(this.getResources().getString(R.string.Ncode_Order_SceneLoop_on));
+        codes.append("03");
+        codes.append("00FF00");
+        SendCodes(codes.toString());//Stop Scene Lopper
+        vdata.SceneStart=false;
+    }
 
 
 }
+
+

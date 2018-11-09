@@ -206,11 +206,16 @@ public class Mybutton extends AppCompatButton {
 
 
     public boolean setOnLong(VData vdata) {
-        if (statu ==1 && !Foucse && !vdata.haveall&&!thinkon ){
+        if (statu ==1 && !Foucse && !thinkon ){
             this.Foucse =true;
-         //   vdata.setInchannge(Integer.parseInt(this.getText().toString()));
-         //   vdata.setSetInOk(false);
-           // vdata.setInClikeoff(true);
+         if (vdata.haveall){
+             Mybutton IN = (Mybutton) getRootView().findViewById(599+vdata.alloutchange);
+             IN.setFoucse(false);
+             IN.thinkon =false;
+             IN.setText(""+vdata.alloutchange);
+             IN.setBackgroundColor(Color.parseColor("#ff1111"));
+         }
+            vdata.alloutchange = this.MyId;
             vdata.haveall =true;
             thinkon =true;
             this.setBackgroundColor(Color.parseColor("#88ff88"));
@@ -243,7 +248,7 @@ public class Mybutton extends AppCompatButton {
            return true;
         }
 
-        if (statu ==1 && Foucse && vdata.haveall &&thinkon){
+        if (statu ==1 && Foucse  &&thinkon){
             Foucse = false ;
             thinkon = false;
            // vdata.setInchannge(0);
