@@ -5,10 +5,8 @@
         android:topRightRadius="20sp"
         android:bottomRightRadius="20sp"
         android:bottomLeftRadius="20sp"
-
         />
-    <stroke android:width="2dp"
-        android:color="@android:color/holo_purple"/>
+
 
     <gradient android:centerX="5"
         android:centerY="5"

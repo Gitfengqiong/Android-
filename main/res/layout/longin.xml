@@ -103,7 +103,7 @@
                 android:layout_weight="5"
                 android:background="@drawable/spinner_item"
                 android:hint="请输入设备IP"
-                android:inputType="text"
+                android:inputType="number"
                 android:padding="10dp"
                 />
 

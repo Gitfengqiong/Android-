@@ -19,11 +19,13 @@ import android.telecom.Call;
 import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
@@ -72,7 +74,7 @@ public class SetingActivtiy extends TabActivity {
         id = (GridLayout) findViewById(R.id.Tab1in);
         ido = (GridLayout) findViewById(R.id.Tab1out);
         Scenel = findViewById(R.id.Scenel);
-        buttonlayot = findViewById(R.id.blayout);
+       // buttonlayot = findViewById(R.id.blayout);
          VData Datas = (VData)getApplication();
         Datas.setInClikeoff(false);
         Datas.setSetInOk(false);
@@ -356,6 +358,7 @@ public class SetingActivtiy extends TabActivity {
             ido.addView(is1);
         }
     }
+    @SuppressLint("ResourceType")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void CreateScene(int insum) {
 
@@ -365,16 +368,22 @@ public class SetingActivtiy extends TabActivity {
             @android.support.annotation.IdRes int ids = 1000 + i;
             is.setId(ids);
             is.id = i+1;
-            
+            buttonlayot = new LinearLayout(getBaseContext());
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            buttonlayot.setOrientation(LinearLayout.VERTICAL);
+            layoutParams.setMargins(0, 0, 0, 0);
+
             GridLayout.LayoutParams param = new GridLayout.LayoutParams(spec(
                     GridLayout.UNDEFINED, GridLayout.FILL, 1f),
                     spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f));
             param.setMargins(3, 3, 3, 3);
-            is.setLayoutParams(param);
-            is.setHeight(200);
+            is.setLayoutParams(layoutParams);
+            buttonlayot.setLayoutParams(param);
+            buttonlayot.setBackground(getResources().getDrawable(R.drawable.button_shap2));
+            is.setHeight(150);
             is.setTextSize(30);
            // is.setBackgroundColor(Color.parseColor("#ff1111"));
-            is.setBackground(getResources().getDrawable(R.drawable.button_shap2));
+        //    is.setBackground(getResources().getDrawable(R.drawable.button_shap2));
             is.setOnClickListener(new View.OnClickListener() {
                                       @Override
                                       public void onClick(View v) {
@@ -384,7 +393,14 @@ public class SetingActivtiy extends TabActivity {
                                   }
             );
             is.setTextColor(Color.parseColor("#ee2233"));
-            Scenel.addView(is);
+            buttonlayot.addView(is);
+            final EditText ise = new EditText(getBaseContext());
+            ise.setHint("备注");
+            ise.setHeight(45);
+            ise.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            ise.setTextColor(Color.parseColor("#33ee11"));
+            buttonlayot.addView(ise);
+            Scenel.addView(buttonlayot);
 
         }
     }

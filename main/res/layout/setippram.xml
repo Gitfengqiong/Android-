@@ -28,6 +28,7 @@
                 android:textAlignment="center"
                 android:digits="0 1 2 3 4 5 6 7 8 9"
                 android:maxLength="3"
+                android:inputType="number"
                 android:textColor="@color/colorlvBtn"
                 />
         </LinearLayout>
@@ -56,6 +57,7 @@
           android:textColor="@color/colorlvBtn"
           android:digits="0 1 2 3 4 5 6 7 8 9 "
           android:maxLength="3"
+          android:inputType="number"
           android:textAlignment="center"
           />
           <TextView
@@ -72,6 +74,7 @@
               android:digits="0 1 2 3 4 5 6 7 8 9 "
               android:maxLength="3"
               android:textAlignment="center"
+              android:inputType="number"
               />
           <TextView
               android:layout_width="wrap_content"
@@ -86,6 +89,7 @@
               android:textColor="@color/colorlvBtn"
               android:digits="0 1 2 3 4 5 6 7 8 9 "
               android:maxLength="3"
+              android:inputType="number"
               android:textAlignment="center"
               />
           <TextView
@@ -101,6 +105,7 @@
               android:textColor="@color/colorlvBtn"
               android:digits="0 1 2 3 4 5 6 7 8 9 "
               android:maxLength="3"
+              android:inputType="number"
               android:textAlignment="center"
               />
       </LinearLayout>
@@ -126,6 +131,7 @@
             android:textColor="@color/colorlvBtn"
             android:digits="0 1 2 3 4 5 6 7 8 9 A B C D E F"
             android:maxLength="12"
+            android:inputType="number"
             android:textAlignment="center"
             />
 
@@ -150,6 +156,7 @@
             android:textColor="@color/colorlvBtn"
             android:digits="0 1 2 3 4 5 6 7 8 9"
             android:maxLength="6"
+            android:inputType="number"
             android:textAlignment="center"
             />
     </LinearLayout>
@@ -177,6 +184,7 @@
                android:textColor="@color/colorlvBtn"
                android:digits="0 1 2 3 4 5 6 7 8 9 "
                android:maxLength="3"
+               android:inputType="number"
                android:textAlignment="center"
                />
            <TextView
@@ -192,6 +200,7 @@
                android:textColor="@color/colorlvBtn"
                android:digits="0 1 2 3 4 5 6 7 8 9 "
                android:maxLength="3"
+               android:inputType="number"
                android:textAlignment="center"
                />
            <TextView
@@ -207,6 +216,7 @@
                android:textColor="@color/colorlvBtn"
                android:digits="0 1 2 3 4 5 6 7 8 9 "
                android:maxLength="3"
+               android:inputType="number"
                android:textAlignment="center"
                />
            <TextView
@@ -222,6 +232,7 @@
                android:textColor="@color/colorlvBtn"
                android:digits="0 1 2 3 4 5 6 7 8 9 "
                android:maxLength="3"
+               android:inputType="number"
                android:textAlignment="center"
                />
        </LinearLayout>
@@ -250,6 +261,7 @@
                 android:textColor="@color/colorlvBtn"
                 android:digits="0 1 2 3 4 5 6 7 8 9 "
                 android:maxLength="3"
+                android:inputType="number"
                 android:textAlignment="center"
                 />
             <TextView
@@ -265,6 +277,7 @@
                 android:textColor="@color/colorlvBtn"
                 android:digits="0 1 2 3 4 5 6 7 8 9 "
                 android:maxLength="3"
+                android:inputType="number"
                 android:textAlignment="center"
                 />
             <TextView
@@ -280,6 +293,7 @@
                 android:textColor="@color/colorlvBtn"
                 android:digits="0 1 2 3 4 5 6 7 8 9 "
                 android:maxLength="3"
+                android:inputType="number"
                 android:textAlignment="center"
                 />
             <TextView
@@ -295,6 +309,7 @@
                 android:textColor="@color/colorlvBtn"
                 android:digits="0 1 2 3 4 5 6 7 8 9 "
                 android:maxLength="3"
+                android:inputType="number"
                 android:textAlignment="center"
                 />
         </LinearLayout>
@@ -319,7 +334,7 @@
             android:layout_height="match_parent"
             android:entries="@array/baud"
             android:textAlignment="center"
-
+            android:background="@drawable/spinner_item"
             />
     </LinearLayout>
 

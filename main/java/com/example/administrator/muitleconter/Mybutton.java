@@ -186,6 +186,7 @@ public class Mybutton extends AppCompatButton {
                     out.Foucse = false;
                     out.setText(out.getMyId()+"");
                     out.setBackground(getResources().getDrawable(R.drawable.button_shap2));
+                    out.setTextColor(Color.parseColor("#ee2233"));
                 }
             }
             vdata.setOutchannge(Integer.parseInt(this.getText().toString()));
@@ -195,7 +196,6 @@ public class Mybutton extends AppCompatButton {
             Log.d("3:","选中输出，等待输入");
             if (Foucse){
                 this.setTextColor(Color.parseColor("#22ee33"));
-
             }
             if (!Foucse){
                 this.setTextColor(Color.parseColor("#ee2233"));
