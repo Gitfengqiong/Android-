@@ -20,6 +20,12 @@
             <shape>
                 <corners android:radius="3dp" />
                 <solid android:color="#16BC5C" />
+                <gradient android:centerX="5"
+                    android:centerY="5"
+                    android:startColor="@color/colorlvBtn"
+                    android:endColor="@color/colorPrimary"
+                    android:useLevel="false"
+                    />
             </shape>
         </clip>
     </item>

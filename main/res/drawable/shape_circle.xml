@@ -9,6 +9,6 @@
         android:color="#16BC5C" />
     <!-- size控制高宽 -->
     <size
-        android:height="20dp"
-        android:width="20dp" />
+        android:height="40sp"
+        android:width="40sp" />
 </shape>

@@ -1,7 +1,9 @@
 package com.example.administrator.muitleconter;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.TabActivity;
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,8 +13,10 @@ import android.os.Message;
 import android.os.Vibrator;
 import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
+import android.support.v4.content.pm.PermissionInfoCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telecom.Call;
+import android.text.Layout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -21,6 +25,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.GridLayout;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
 import android.widget.TabHost;
@@ -48,7 +53,11 @@ public class SetingActivtiy extends TabActivity {
     protected static final int Msid1 = 0x130;
     protected static final int Mrid1 = 0x140;
     protected static MyUdpIo Internets ;
+    protected static final int Mstatue = 0x230;
+    protected static Handler Statue ;
+    private LinearLayout buttonlayot;
 
+    @SuppressLint("HandlerLeak")
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
@@ -63,6 +72,7 @@ public class SetingActivtiy extends TabActivity {
         id = (GridLayout) findViewById(R.id.Tab1in);
         ido = (GridLayout) findViewById(R.id.Tab1out);
         Scenel = findViewById(R.id.Scenel);
+        buttonlayot = findViewById(R.id.blayout);
          VData Datas = (VData)getApplication();
         Datas.setInClikeoff(false);
         Datas.setSetInOk(false);
@@ -106,8 +116,11 @@ public class SetingActivtiy extends TabActivity {
                     codes.append(hexnum);
                 }
                 codes.append("00");
-                SendCodes(codes.toString());//Stop Scene Lopper
-                Log.d("Timer::",codes.toString());
+                SendCodes(codes.toString());//Set Scene Timer
+               // Log.d("Timer::",codes.toString());
+                Toast.makeText(getBaseContext(),"循环间隔："+String.valueOf(time),Toast.LENGTH_SHORT).show();
+                vdata.ReCode="null";
+                SendStatue();
             }
         });
 
@@ -117,20 +130,20 @@ public class SetingActivtiy extends TabActivity {
         for (int i=1 ;i<=vdata.Scenenum; i++){
             Scenelist.add("场景"+String.valueOf(i));
         }
-        ArrayAdapter<String> adapter;
-        adapter = new ArrayAdapter<String>(this,android.R.layout.simple_spinner_item, Scenelist);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Scenelist.add("请选择：");
+        SceneArrayAdapter<String> adapter;
+        adapter = new SceneArrayAdapter<String>(this,R.layout.spinner_view, R.id.txtvwSpinner , Scenelist);
+        adapter.setDropDownViewResource(R.layout.spinner_drop);
         Savelist.setAdapter(adapter);
         Calllist.setAdapter(adapter);
-        final boolean[] first = {true};
+        Savelist.setSelection(Scenelist.size()-1,true);
+        Calllist.setSelection(Scenelist.size()-1,true);
         Savelist.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                if (first[0]){
-                    view.setVisibility(View.INVISIBLE);
-                }
+
                 position+=1;
                 StringBuffer codes ;
                 String leng = "03";
@@ -166,10 +179,7 @@ public class SetingActivtiy extends TabActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
-                    if (first[0]){
-                        view.setVisibility(View.INVISIBLE);
-                    }
-                    first[0] =false ;
+
                 position+=1;
                 StringBuffer codes ;
                 String leng = "03";
@@ -204,30 +214,32 @@ public class SetingActivtiy extends TabActivity {
        Internets = new MyUdpIo(handler,vdata.Thisip,Mrid1,Msid1);
        new Thread(Internets).start();
         vibrator = (Vibrator)this.getSystemService(this.VIBRATOR_SERVICE);
-        new Thread(new Runnable() {
+        new Thread(String.valueOf( Statue = new Handler() {
             @Override
-            public void run() {
-                try { Looper.prepare();
-                    synchronized (this){
-                        wait(1500);
-                        if (vdata.ReCode.equals("55")) {
+            public void handleMessage(Message msg)  {
+                synchronized (this) {
+                    if (msg.what == Mstatue) {
+                        try {
+                            wait(1000);
+                            if (vdata.ReCode.equals("55")) {
 //
-  //                          Toast.makeText(getBaseContext(),"指令执行成功",Toast.LENGTH_LONG).show();
+                                Toast.makeText(getBaseContext(),"指令执行成功",Toast.LENGTH_SHORT).show();
 
-                        }else{
+                            } else if(vdata.ReCode.equals("null")){
 
-    //                        Toast.makeText(getBaseContext(),"指令执行错误",Toast.LENGTH_LONG).show();
-
+                        Toast.makeText(getBaseContext(),"设备无响应",Toast.LENGTH_SHORT).show();
+                            }else {
+                                Toast.makeText(getBaseContext(),"执行错误："+vdata.ReCode,Toast.LENGTH_LONG).show();
+                            }
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
                         }
 
                     }
-                    Looper.loop();
-
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
+
             }
-        }).start();
+        })).start();
 
 
     }
@@ -247,11 +259,12 @@ public class SetingActivtiy extends TabActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (reference.get() != null) {
-                switch (msg.what) {
+                switch (msg.what ) {
                     case Mrid1:
                         // do something...
                     {
-                        Log.d("set收到数据", msg.obj.toString());
+                        //Log.d("set收到数据", msg.obj.toString());
+                     //   Toast.makeText(,msg.obj.toString(),Toast.LENGTH_LONG);
                         String data = msg.obj.toString();
                         vdata.LoginOk = true;
                         ParseCode.Parsecode(data);
@@ -286,12 +299,13 @@ public class SetingActivtiy extends TabActivity {
             is.setLayoutParams(param);
             is.setHeight(200);
             is.setTextSize(30);
-            is.setBackgroundColor(Color.parseColor("#ff1111"));
+          //  is.setBackgroundColor(Color.parseColor("#ff1111"));
+            is.setBackground(getResources().getDrawable(R.drawable.button_shap2));
             is.setOnClickListener(new View.OnClickListener() {
                                       @Override
                                       public void onClick(View v) {
                                           vibrator.vibrate(70);
-                                          ((Mybutton) is).Clickstart(vdata );
+                                          ((Mybutton) is).Clickstart(vdata);
                                       }
                                   }
             );
@@ -304,6 +318,7 @@ public class SetingActivtiy extends TabActivity {
                                           }
                                       }
             );
+            is.setTextColor(Color.parseColor("#ee2233"));
             ((Mybutton) is).setStatu(1);
             id.addView(is);
 
@@ -324,7 +339,8 @@ public class SetingActivtiy extends TabActivity {
             is1.setLayoutParams(param);
             is1.setTextSize(30);
             is1.setHeight(200);
-            is1.setBackgroundColor(Color.parseColor("#ff1111"));
+            //is1.setBackgroundColor(Color.parseColor("#ff1111"));
+            is1.setBackground(getResources().getDrawable(R.drawable.button_shap2));
            // is1.setTextAlignment();
             is1.setOnClickListener(new View.OnClickListener() {
                                        @Override
@@ -336,6 +352,7 @@ public class SetingActivtiy extends TabActivity {
                                    }
             );
             ((Mybutton) is1).setStatu(0);
+            is1.setTextColor(Color.parseColor("#ee2233"));
             ido.addView(is1);
         }
     }
@@ -348,6 +365,7 @@ public class SetingActivtiy extends TabActivity {
             @android.support.annotation.IdRes int ids = 1000 + i;
             is.setId(ids);
             is.id = i+1;
+            
             GridLayout.LayoutParams param = new GridLayout.LayoutParams(spec(
                     GridLayout.UNDEFINED, GridLayout.FILL, 1f),
                     spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f));
@@ -355,7 +373,8 @@ public class SetingActivtiy extends TabActivity {
             is.setLayoutParams(param);
             is.setHeight(200);
             is.setTextSize(30);
-            is.setBackgroundColor(Color.parseColor("#ff1111"));
+           // is.setBackgroundColor(Color.parseColor("#ff1111"));
+            is.setBackground(getResources().getDrawable(R.drawable.button_shap2));
             is.setOnClickListener(new View.OnClickListener() {
                                       @Override
                                       public void onClick(View v) {
@@ -364,12 +383,13 @@ public class SetingActivtiy extends TabActivity {
                                       }
                                   }
             );
+            is.setTextColor(Color.parseColor("#ee2233"));
             Scenel.addView(is);
 
         }
     }
 
-    public void SceneStart(View view){
+    public void SceneStart(View view) throws InterruptedException {
         vdata.SceneStart = true ;
         int Snum = vdata.Scenenum ;
         vibrator.vibrate(70);
@@ -471,6 +491,7 @@ public class SetingActivtiy extends TabActivity {
             codes.append(hexnum);
         }
         if (d1 <16){
+            if ((d1+d2) < 1) d1 =1 ;
             String hexnum1 = Integer.toString(d1,16);
             codes.append("0");
             codes.append(hexnum1);
@@ -480,17 +501,39 @@ public class SetingActivtiy extends TabActivity {
         }
 
         codes.append("00");
-        Log.d("Scence:",codes.toString());
+       // Log.d("Scence:",codes.toString());
         SendCodes(codes.toString());//Set Scene Lopper Number
-        codes.delete(0,codes.length());
-        codes.append(this.getResources().getString(R.string.Ncode_Begin));
-        codes.append(vdata.devaddrid);
-        codes.append(this.getResources().getString(R.string.Ncode_Order_SceneLoop_on));
-        codes.append("03");
-        codes.append("000000");
-        SendCodes(codes.toString());//Start Scene Lopper
-        vdata.SceneStart =true ;
+        synchronized (this) {
+            try {
+                wait(500);
+                codes.delete(0, codes.length());
+                codes.append(getBaseContext().getResources().getString(R.string.Ncode_Begin));
+                codes.append(vdata.devaddrid);
+                codes.append(getBaseContext().getResources().getString(R.string.Ncode_Order_SceneLoop_Timer));
+                codes.append("03");
+                codes.append("00");
+                codes.append("03");
+                codes.append("00");
+                SendCodes(codes.toString());//Set Scene UDF Timer ***3S****
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
 
+        }
+        synchronized (this){
+            wait(500);
+            codes.delete(0,codes.length());
+            codes.append(this.getResources().getString(R.string.Ncode_Begin));
+            codes.append(vdata.devaddrid);
+            codes.append(this.getResources().getString(R.string.Ncode_Order_SceneLoop_on));
+            codes.append("03");
+            codes.append("000000");
+            SendCodes(codes.toString());//Start Scene Lopper
+        }
+        vdata.SceneStart =true ;
+        Toast.makeText(getBaseContext(),"场景循环启动...",Toast.LENGTH_SHORT).show();
+        vdata.ReCode="null";
+        SendStatue();
     }
     public static   void SendCodes(String codes){
 
@@ -505,6 +548,11 @@ public class SetingActivtiy extends TabActivity {
         }catch (Exception e){e.printStackTrace();}
 
     }
+    private static void SendStatue(){
+        Message msg = new Message();
+        msg.what = Mstatue;
+        Statue.sendMessage(msg);
+    }
     public  void  SceneStop(View view){
         StringBuffer codes ;
         codes =new StringBuffer();
@@ -515,9 +563,10 @@ public class SetingActivtiy extends TabActivity {
         codes.append("00FF00");
         SendCodes(codes.toString());//Stop Scene Lopper
         vdata.SceneStart=false;
+        Toast.makeText(getBaseContext(),"场景循环关闭...",Toast.LENGTH_SHORT).show();
+        vdata.ReCode="null";
+        SendStatue();
     }
 
 
 }
-
-

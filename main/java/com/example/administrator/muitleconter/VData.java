@@ -6,7 +6,7 @@ public class VData extends Application {
     public void onCreate() {
         super.onCreate();
     }
-    private int Outchannge ;
+    private int Outchannge  = 0;
     private int Inchannge;
     private boolean waiteIn = false;
     private boolean SetInOk =false;
@@ -14,7 +14,7 @@ public class VData extends Application {
     private boolean InClikeoff = false ;
     private int Owaiteid = 0;
     public boolean LoginOk =false;
-    public String ReCode ;
+    public String ReCode ="null" ;
     public String devaddrid ="01";
     public String vtype = "A0";
     public  String cleng;
