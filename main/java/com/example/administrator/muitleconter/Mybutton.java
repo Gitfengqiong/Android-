@@ -102,7 +102,6 @@ public class Mybutton extends AppCompatButton {
             codes.append("00");
             SendCodes(codes.toString());
            // Log.d("1:",codes.toString());
-            vdata.ReCode = "null";
             SendStatue();
             if (Foucse){
                 this.setTextColor(Color.parseColor("#22ee33"));
@@ -162,7 +161,6 @@ public class Mybutton extends AppCompatButton {
             }
             codes.append("00");
             SendCodes(codes.toString());
-            vdata.ReCode = "null";
             SendStatue();
             // Log.d("1:",codes.toString());
             if (Foucse){
@@ -242,7 +240,6 @@ public class Mybutton extends AppCompatButton {
             }
             codes.append("00");
             SendCodes(codes.toString());
-            vdata.ReCode = "null";
             SendStatue();
             if (Foucse){
                 this.setTextColor(Color.parseColor("#22ee33"));
@@ -339,7 +336,6 @@ public class Mybutton extends AppCompatButton {
             codes.append(hexchange);
             codes.append("000000");
             SendCodes(codes.toString());
-            vdata.ReCode = "null";
             SendStatue();
             for (int i=0 ; i <vdata.outleng ;i++)
             {

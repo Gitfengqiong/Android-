@@ -60,7 +60,8 @@
                 android:background="@drawable/button_shap1"
                 android:layout_gravity="center_vertical|center_horizontal"
                 android:onClick="search"
-                android:text="搜索" />
+                android:text="搜索&#10;Search"
+                />
             </LinearLayout>
 
         </LinearLayout>
@@ -114,7 +115,7 @@
                 android:layout_marginLeft="10sp"
                 android:onClick="Links"
                 android:background="@drawable/button_shap1"
-                android:text="确认" />
+                android:text="确认&#10;OK" />
         </LinearLayout>
         </LinearLayout>
 

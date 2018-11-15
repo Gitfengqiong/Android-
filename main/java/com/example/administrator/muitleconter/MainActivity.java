@@ -19,6 +19,9 @@ package com.example.administrator.muitleconter;
         import android.widget.SimpleAdapter;
         import android.widget.Spinner;
         import android.widget.Toast;
+
+        import java.io.File;
+        import java.io.IOException;
         import java.lang.ref.WeakReference;
         import java.util.ArrayList;
         import java.util.HashMap;
@@ -43,6 +46,9 @@ public class MainActivity extends Activity {
     private static ListView listView;
     private static List<Map<String,Object>> listitems;
     private static String IP;
+    protected static File config ;
+    protected static String SceneRemark[] ;
+    private static boolean  NewD = false;
     //private static String debugs;
    // private static EditText e;
   //  protected static MyUdpIo  Internets;
@@ -50,6 +56,9 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.longin);
+        //Cheek InterNet
+       if(!CheekInternet.isNetworkAvalible(this))
+           CheekInternet.checkNetwork(this);
         ipin = findViewById(R.id.inip);
         listView = findViewById(R.id.list_view);
         ipin.setKeyListener(DigitsKeyListener.getInstance("1234567890."));
@@ -60,6 +69,7 @@ public class MainActivity extends Activity {
         runhandler = new Handler();
         final VData vdata = (VData) getApplication();
         vdate = vdata;
+        SceneRemark = new String[vdate.Scenenum];
          //e = findViewById(R.id.beugs);
        multicast = new Multicast(this.getResources().getString(R.string.Multi_ip),Integer.parseInt((getResources().getString(R.string.Multi_port))
        ),handler,MMrid,MMsid,this.getResources().getString(R.string.Ncode_FindDev));
@@ -74,7 +84,7 @@ public class MainActivity extends Activity {
         new Thread(multicast).start();
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener(){
             @Override
-            public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
+            public void onItemClick(AdapterView<?> arg0, View arg1, final int arg2,
                                     long arg3) {
                // vdata.LoginOk =false ;
                 //获得选中项的HashMap对象
@@ -85,25 +95,60 @@ public class MainActivity extends Activity {
                         "链接："+IP+"中...",Toast.LENGTH_SHORT).show();
             //    podia = ProgressDialog.show(getBaseContext(), "连接设备", "正在连接中...请稍等", false, true);
                 Internet.setIp(IP);
-                Toast.makeText(getBaseContext(),Internet.getIp(),Toast.LENGTH_LONG);
-                Internet.setMreid(Mrid);
-                Internet.setMseid(Msid);
-                Message msg = new Message();
-                msg.what = Msid;
-                String m = "BA01140200D1";//发送一条指令等待应答
-                //  msg.obj =String.valueOf(m);
-                msg.obj = m;
-                Log.d("set Sys","");
-                Internet.rehandler.sendMessage(msg);
+                vdata.LoginOk =false ;
+                Message callMac  = new Message() ;
+                callMac.what = Msid ;
+                callMac.obj = "BA019604AA000000";
+                Internet.rehandler.sendMessage(callMac);
+                new Thread(){
+                    @Override
+                    public void run() {
+                        super.run();
+                        synchronized (this){
+                            try {
+                                wait(300);
+                                Looper.prepare();
+                                if(!vdate.LoginOk){
+                                    Toast.makeText(getBaseContext(),"旧版本设备",Toast.LENGTH_LONG).show();
+                                    vdata.my_ethernet_address = iPlist[arg2].my_ethernet_address.toCharArray();
+                                }else {
+                                    Toast.makeText(getBaseContext(),"新版本设备",Toast.LENGTH_LONG).show();
+                                    vdate.my_ethernet_address = (vdate.code5+vdate.code6+vdate.code7+vdate.code8+vdate.code9+vdate.code10).toCharArray();
+                                }
+                                Looper.loop();
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }.start();
+
               //  podia1 = ProgressDialog.show(getBaseContext(), "连接设备", "正在连接中...请稍等", false, true);
-               synchronized (this){
-                   try {
-                       wait(500);
-                       runhandler.post(beug);
-                   } catch (InterruptedException e) {
-                       e.printStackTrace();
-                   }
-               }
+                new Thread(){
+                    @Override
+                    public void run() {
+                        super.run();
+                        synchronized (this){
+                            try {
+                                wait(700);
+                                vdata.LoginOk=false;
+                                Internet.setMreid(Mrid);
+                                Internet.setMseid(Msid);
+                                Message msg = new Message();
+                                msg.what = Msid;
+                                String m = "BA01140200D1";//发送一条指令等待应答
+                                //  msg.obj =String.valueOf(m);
+                                msg.obj = m;
+                                Internet.rehandler.sendMessage(msg);
+                                wait(200);
+                                runhandler.post(beug);
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }.start();
+
 
             }
 
@@ -294,8 +339,6 @@ public class MainActivity extends Activity {
         public void run() {
 
             if (vdate.LoginOk) {
-              //  podia1.dismiss();
-                vdate.my_ethernet_address = IP.toCharArray();
                 vdate.Thisip =Internet.getIp();
                 vdate.devaddrid = vdate.code1;
                 vdate.vtype = vdate.code5;
@@ -316,6 +359,7 @@ public class MainActivity extends Activity {
     public void Links(View view) throws InterruptedException {
         vdate.LoginOk =false;
         vdate.my_ethernet_address ="".toCharArray();
+
         if(ipin.getText().toString().isEmpty()){
             Toast toast = Toast.makeText(this,"请输入地址",Toast.LENGTH_SHORT);
             toast.show();
@@ -333,8 +377,7 @@ public class MainActivity extends Activity {
             vdate.LoginOk =true;
            runhandler.post(runui);
 
-        }else //跳转到设置页
-            if(ipin.getText().toString().length() <7){
+        }else if(ipin.getText().toString().length() <7){
             Toast toast = Toast.makeText(this,"地址错误",Toast.LENGTH_SHORT);
             toast.show();
         }else {
@@ -342,24 +385,61 @@ public class MainActivity extends Activity {
                         Internet.setIp(ipin.getText().toString());
                         Internet.setMreid(Mrid);
                         Internet.setMseid(Msid);
-                        Message msg = new Message();
-                        msg.what = Msid;
-                        String m = this.getString(R.string.Ncode_Order_GetSYS);//发送一条指令等待应答
-                        //  msg.obj =String.valueOf(m);
-                        msg.obj = m;
-                        Internet.rehandler.sendMessage(msg);
-                        podia = ProgressDialog.show(this, "连接设备", "正在连接中...请稍等", false, true);
+                        Message callMac  = new Message() ;
+                        callMac.what = Msid ;
+                        callMac.obj = "BA019604AA000000";
+                        Internet.rehandler.sendMessage(callMac);
+                        new Thread(){
+                            @Override
+                            public void run() {
+                                super.run();
+                                synchronized (this){
+                                    try {
+                                        wait(500);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    Looper.prepare();
+                                    if(!vdate.LoginOk){
+                                        Toast.makeText(getBaseContext(),"旧设备，请在搜索中进入",Toast.LENGTH_LONG).show();
+                                        NewD = false ;
+
+                                    }else {
+                                       // Toast.makeText(getBaseContext(),"",Toast.LENGTH_LONG).show();
+                                        vdate.my_ethernet_address = (vdate.code5+vdate.code6+vdate.code7+vdate.code8+vdate.code9+vdate.code10).toCharArray();
+                                        NewD = true ;
+                                        Log.d("ID",vdate.my_ethernet_address.toString());
+                                    }
+                                    Looper.loop();
+                                }
+                            }
+                        }.start();
+
+
+                    podia = ProgressDialog.show(this, "连接设备", "正在连接中...请稍等", false, true);
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
                             try {
                                 synchronized (this){
+                                    wait(500);
+                                    Message msg = new Message();
+                                    msg.what = Msid;
+                                    String m = getResources().getString(R.string.Ncode_Order_GetSYS);//发送一条指令等待应答
+                                    //  msg.obj =String.valueOf(m);
+                                    msg.obj = m;
+                                    Internet.rehandler.sendMessage(msg);
+                                    vdate.LoginOk =false ;
+                                }
+
+                                synchronized (this){
                                     wait(1500);
-                                    if (vdate.LoginOk) {
-                                        vdate.my_ethernet_address = ipin.getText().toString().toCharArray();
+                                    if (vdate.LoginOk&&NewD) {
+                                      //  vdate.my_ethernet_address = (vdate.code5+vdate.code6+vdate.code7+vdate.code8+vdate.code9+vdate.code10).toCharArray();
                                         runhandler.post(runui);
+                                        podia.dismiss();
                                     } else if (!vdate.LoginOk) {
-                                        vdate.my_ethernet_address = ipin.getText().toString().toCharArray();
+                                        vdate.my_ethernet_address = (vdate.code5+vdate.code6+vdate.code7+vdate.code8+vdate.code9+vdate.code10).toCharArray();
                                         /*
                                         String my = "ff";
                                         int num = Integer.parseInt(my,16);
@@ -436,6 +516,7 @@ public class MainActivity extends Activity {
         @Override
         public void handleMessage(Message msg) {
             String Vdebugs  = "";
+
             if (reference.get() != null) {
                 switch (msg.what) {
                     case Mrid:
@@ -465,6 +546,7 @@ public class MainActivity extends Activity {
                     }
                 }
             }
+
         }
     }
 

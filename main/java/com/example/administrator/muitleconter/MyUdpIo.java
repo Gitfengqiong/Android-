@@ -24,7 +24,7 @@ public class MyUdpIo implements Runnable {
         private  int diverport = 4068;
         private  int Mreid;
         private  int Mseid;
-        byte Data[]=new byte[10];
+        byte Data[]=new byte[15];
         private static final char[] HEX_CHAR = {'0', '1', '2', '3', '4', '5',
             '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
         public MyUdpIo(Handler handler){
@@ -99,37 +99,43 @@ public class MyUdpIo implements Runnable {
         @Override
         public void   run() {
 
+
             try {
-                if(s==null){
-                    s = new DatagramSocket(null);
-                    s.setReuseAddress(true);
-                    s.bind(new InetSocketAddress(Localport));
-                }
-               // s=new DatagramSocket(Localport);
-                br = new DatagramPacket(Data,Data.length) ;
+
 
                 new Thread(){
                     @Override
                     public void run() {
                         super.run();
+
                         String Connet =null;//服务器端数据
-                        try {
+                       while (true) {
+                           try {
+                               if(s==null){
+                                   s = new DatagramSocket(null);
+                                   s.setReuseAddress(true);
+                                   s.bind(new InetSocketAddress(Localport));
+                               }
+                               // s=new DatagramSocket(Localport);
+                               br = new DatagramPacket(Data,Data.length) ;
+                               s.receive(br);
+                               if (br.getLength() > 0) {
+                                   /* 收到数据后返回数据到主线 */
+                                   Message msg = new Message();
+                                   msg.what = Mreid;
+                                   msg.obj = bytesToHexString(br.getData());
+                                   handler.sendMessage(msg);
+                                   br.setLength(0);
+                               }
+                               s.close();
+                               s=null;
+                               br.setLength(0);
 
-                            s.receive(br);
-                            while (br.getLength()>0)
-                            {
-                                /* 收到数据后返回数据到主线 */
-                                Message msg =new Message();
-                                msg.what = Mreid;
-                                msg.obj =bytesToHexString(br.getData());
-                                handler.sendMessage(msg);
-                                br.setLength(0);
 
-
-                            }
-                        }catch (IOException e){
-                            e.printStackTrace();
-                        }
+                           } catch (IOException e) {
+                               e.printStackTrace();
+                           }
+                       }
                     }
                 }.start();//启动接收线程
                 Looper.prepare();//当前线程初始化Looper

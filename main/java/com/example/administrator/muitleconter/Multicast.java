@@ -85,6 +85,7 @@ public class Multicast  implements Runnable {
             @Override
             public void run() {
                 super.run();
+
                 try {
                     synchronized (this) {
                         while (true) {

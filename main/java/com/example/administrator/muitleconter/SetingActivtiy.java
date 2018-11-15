@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.TabActivity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -16,12 +17,16 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.content.pm.PermissionInfoCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.telecom.Call;
+import android.text.Editable;
 import android.text.Layout;
+import android.text.TextWatcher;
+import android.transition.Scene;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -35,11 +40,15 @@ import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
 import static android.widget.GridLayout.spec;
+import static com.example.administrator.muitleconter.MainActivity.SceneRemark;
+import static com.example.administrator.muitleconter.MainActivity.config;
 
 //import static com.example.administrator.muitleconter.MainActivity.Internets;
 
@@ -58,7 +67,8 @@ public class SetingActivtiy extends TabActivity {
     protected static final int Mstatue = 0x230;
     protected static Handler Statue ;
     private LinearLayout buttonlayot;
-
+    protected static String FileNames ;
+    private static  boolean Keyboardon = false ;
     @SuppressLint("HandlerLeak")
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -74,17 +84,48 @@ public class SetingActivtiy extends TabActivity {
         id = (GridLayout) findViewById(R.id.Tab1in);
         ido = (GridLayout) findViewById(R.id.Tab1out);
         Scenel = findViewById(R.id.Scenel);
+
        // buttonlayot = findViewById(R.id.blayout);
          VData Datas = (VData)getApplication();
         Datas.setInClikeoff(false);
         Datas.setSetInOk(false);
         Datas.setWaiteIn(false);
-        Datas.ReCode = "00";
+        Datas.ReCode = "55";
         vdata =Datas;
         Createview(vdata.inleng,vdata.outleng);
         CreateScene(vdata.Scenenum);
-       SeekBar seekBar = (SeekBar) findViewById(R.id.progress);
-       final TextView textView = (TextView) findViewById(R.id.text1);
+
+        for (int i = 0 ; i<vdata.Scenenum ; i++){
+            SceneRemark[i] = "null";
+        }
+       FileNames =  this.getFilesDir().getPath()+String.valueOf(vdata.my_ethernet_address)+".cfg";
+        config = new File(FileNames);
+        if(!config.exists())
+        {
+            try {
+                //文件不存在，就创建一个新文件
+                config.createNewFile();
+                 //  System.out.println("文件已经创建了");
+                Toast.makeText(this,"New Device",Toast.LENGTH_SHORT);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else
+        {
+           //  System.out.println("文件已经存在");
+         //    System.out.println("文件名："+config.getName());
+          //  System.out.println("文件绝对路径为："+config.getAbsolutePath());
+            //是存在工程目录下，所以
+         //    System.out.println("文件相对路径为："+config.getPath());
+         //    System.out.println("文件大小为："+config.length()+"字节");
+         //   System.out.println("文件是否可读："+config.canRead());
+          //   System.out.println("文件是否可写："+config.canWrite());
+            // System.out.println("我呢间是否隐藏："+file.isHidden());
+        }
+
+        SeekBar seekBar = (SeekBar) findViewById(R.id.progress);
+        final TextView textView = (TextView) findViewById(R.id.text1);
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             private int time ;
             @Override
@@ -121,7 +162,7 @@ public class SetingActivtiy extends TabActivity {
                 SendCodes(codes.toString());//Set Scene Timer
                // Log.d("Timer::",codes.toString());
                 Toast.makeText(getBaseContext(),"循环间隔："+String.valueOf(time),Toast.LENGTH_SHORT).show();
-                vdata.ReCode="null";
+               // vdata.ReCode="null";
                 SendStatue();
             }
         });
@@ -166,7 +207,7 @@ public class SetingActivtiy extends TabActivity {
                 codes.append("00");
                 Log.d("Save Scence:",codes.toString());
                 SendCodes(codes.toString());//Set Scene
-
+                SendStatue();
             }
 
             @Override
@@ -202,6 +243,7 @@ public class SetingActivtiy extends TabActivity {
                 codes.append("00");
                 Log.d("Call Scence:",codes.toString());
                 SendCodes(codes.toString());//Call Scene
+                SendStatue();
 
             }
 
@@ -211,6 +253,21 @@ public class SetingActivtiy extends TabActivity {
 
             }
         });
+        // Init Scene remark
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                ParseCode.parseSceneRemark(FileNames);
+                for (int i = 0 ; i<vdata.Scenenum ; i++){
+                    SceneButton button = findViewById(1000+i);
+                    if (!SceneRemark[i].equals("null")&&!SceneRemark[i].equals("")){
+                        button.Remark = SceneRemark[i];
+                    }
+
+                }
+            }
+        }.start();
 
         MyHandler handler = new MyHandler(this);
        Internets = new MyUdpIo(handler,vdata.Thisip,Mrid1,Msid1);
@@ -223,14 +280,13 @@ public class SetingActivtiy extends TabActivity {
                     if (msg.what == Mstatue) {
                         try {
                             wait(1000);
-                            if (vdata.ReCode.equals("55")) {
-//
-                                Toast.makeText(getBaseContext(),"指令执行成功",Toast.LENGTH_SHORT).show();
-
-                            } else if(vdata.ReCode.equals("null")){
-
+                             if(vdata.ReCode.equals("null")){
                         Toast.makeText(getBaseContext(),"设备无响应",Toast.LENGTH_SHORT).show();
-                            }else {
+                            }else if(vdata.ReCode.equals("55")) {
+                                 vdata.ReCode ="null";
+                                 Toast.makeText(getBaseContext(),"操作成功",Toast.LENGTH_SHORT).show();
+
+                             }else {
                                 Toast.makeText(getBaseContext(),"执行错误："+vdata.ReCode,Toast.LENGTH_LONG).show();
                             }
                         } catch (InterruptedException e) {
@@ -271,7 +327,7 @@ public class SetingActivtiy extends TabActivity {
                         vdata.LoginOk = true;
                         ParseCode.Parsecode(data);
                         vdata.ReCode = vdata.code4;
-                      //  Log.d("Re",vdata.ReCode);
+                    //    Log.d("Re",vdata.ReCode);
                         break;
                     }
                     default: {
@@ -361,7 +417,7 @@ public class SetingActivtiy extends TabActivity {
     @SuppressLint("ResourceType")
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     public void CreateScene(int insum) {
-
+        final EditText e = new EditText(getBaseContext());
         for (int i = 0; i < insum; i++) {
             final SceneButton is = new SceneButton(getBaseContext());
             is.setText(i + 1 + "");
@@ -380,8 +436,10 @@ public class SetingActivtiy extends TabActivity {
             is.setLayoutParams(layoutParams);
             buttonlayot.setLayoutParams(param);
             buttonlayot.setBackground(getResources().getDrawable(R.drawable.button_shap2));
+            int h = buttonlayot.getHeight();
             is.setHeight(150);
             is.setTextSize(30);
+
            // is.setBackgroundColor(Color.parseColor("#ff1111"));
         //    is.setBackground(getResources().getDrawable(R.drawable.button_shap2));
             is.setOnClickListener(new View.OnClickListener() {
@@ -394,11 +452,102 @@ public class SetingActivtiy extends TabActivity {
             );
             is.setTextColor(Color.parseColor("#ee2233"));
             buttonlayot.addView(is);
-            final EditText ise = new EditText(getBaseContext());
+            final Remark_Edit ise = new Remark_Edit(getBaseContext());
+
+            ise.Buttonid = ids ;
             ise.setHint("备注");
-            ise.setHeight(45);
+            ise.setHeight(65);
+            //ise.weight();
             ise.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             ise.setTextColor(Color.parseColor("#33ee11"));
+            buttonlayot.getViewTreeObserver().addOnGlobalLayoutListener(
+                    new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+
+                            Rect r = new Rect();
+                            buttonlayot.getWindowVisibleDisplayFrame(r);
+                            int screenHeight = buttonlayot.getRootView()
+                                    .getHeight();
+                            int heightDifference = screenHeight - (r.bottom);
+                            if (heightDifference > 200) {
+                                //软键盘显示
+                                Keyboardon = true;
+                            //    Log.d("Up","keys");
+// changeKeyboardHeight(heightDifference);
+                            } else if (screenHeight > 20 && heightDifference < 200) {
+                                //软键盘隐藏
+
+                              //  if (!Keyboardon) {  Log.d("down","keys");
+
+                              //  ise.setFocusableInTouchMode(true);
+                              //      ise.setFocusable(true);
+                                   // ise.clearFocus();
+
+                                //}
+                                Keyboardon = false;
+                            }
+
+                        }
+
+                    });
+            //监听软键盘是否显示或隐藏
+
+            /*
+            ise.addTextChangedListener(new TextWatcher() {
+
+                @Override
+                public void onTextChanged(CharSequence text, int start, int before, int count) {
+                    //text  输入框中改变后的字符串信息
+                    //start 输入框中改变后的字符串的起始位置
+                    //before 输入框中改变前的字符串的位置 默认为0
+                    //count 输入框中改变后的一共输入字符串的数量
+
+
+                }
+
+                @Override
+                public void beforeTextChanged(CharSequence text, int start, int count,int after) {
+                    //text  输入框中改变前的字符串信息
+                    //start 输入框中改变前的字符串的起始位置
+                    //count 输入框中改变前后的字符串改变数量一般为0
+                    //after 输入框中改变后的字符串与起始位置的偏移量
+
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+                   ise.SaveEidtMark();
+                }
+
+
+            });
+
+*/
+            ise.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+
+// TODO Auto-generated method stub
+                    if (hasFocus) {
+
+                    }
+                    if (!hasFocus) {
+                      if (Keyboardon){
+                          ise.EidtMark();
+                      }else
+                        if (!Keyboardon){
+                          ise.SaveEidtMark();
+                      }
+
+
+                    }
+
+                }
+
+            });
+
+
             buttonlayot.addView(ise);
             Scenel.addView(buttonlayot);
 
@@ -548,7 +697,6 @@ public class SetingActivtiy extends TabActivity {
         }
         vdata.SceneStart =true ;
         Toast.makeText(getBaseContext(),"场景循环启动...",Toast.LENGTH_SHORT).show();
-        vdata.ReCode="null";
         SendStatue();
     }
     public static   void SendCodes(String codes){
@@ -580,7 +728,6 @@ public class SetingActivtiy extends TabActivity {
         SendCodes(codes.toString());//Stop Scene Lopper
         vdata.SceneStart=false;
         Toast.makeText(getBaseContext(),"场景循环关闭...",Toast.LENGTH_SHORT).show();
-        vdata.ReCode="null";
         SendStatue();
     }
 

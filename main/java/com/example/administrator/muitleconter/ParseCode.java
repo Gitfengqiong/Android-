@@ -1,8 +1,21 @@
 package com.example.administrator.muitleconter;
 
+import android.content.Context;
 import android.util.Log;
 
 //import static com.example.administrator.muitleconter.MainActivity.vdate;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+
+import static android.content.Context.*;
+import static com.example.administrator.muitleconter.MainActivity.SceneRemark;
+import static com.example.administrator.muitleconter.MainActivity.config;
 import static com.example.administrator.muitleconter.MainActivity.iPlist;
 import static com.example.administrator.muitleconter.MainActivity.ipIndex;
 import static com.example.administrator.muitleconter.MainActivity.vdate;
@@ -20,16 +33,16 @@ public class ParseCode {
              }
              String substring;
              substring = data.substring(i, i + 2).toUpperCase();
-             Log.d("Subs1:", substring);
+           //  Log.d("Subs1:", substring);
              //一条指令
              if (substring.equals("BA") && (data.length() - i) > 2) {
-                 Log.d("find code", valueOf(i));
+              //   Log.d("find code", valueOf(i));
                  for (int j = i + 2, mode = 1; 1 < data.length() - j; j++) {
                      substring = data.substring(j, j + 2).toUpperCase();
-                     Log.d("Subs2:", substring);
+                 //    Log.d("Subs2:", substring);
                      if (data.length() - j < 2 || substring.length() < 2 || substring.equals("BA")) {
                          i = j - 2;
-                         Log.d("break code j:", valueOf(j));
+                   //      Log.d("break code j:", valueOf(j));
                          break;
                      }
                      switch (mode) {
@@ -119,7 +132,6 @@ public class ParseCode {
                              continue;
                      }
 
-                     Log.d("next code mode", valueOf(j));
                      j++;
                      i = j + 3;
                  }
@@ -143,7 +155,6 @@ public class ParseCode {
                 substring = data.substring(i,i+=2);
                // Log.d("sub2",substring);
                 if (substring.equals("FE") && (data.length() - i) > 2){
-                    Log.d("Subs1:", substring);
                     substring = data.substring(i,i+=2);
                     if  (substring.equals("01") && (data.length() - i) > 2){
                      //   Log.d("Subs1:", substring);
@@ -310,6 +321,106 @@ public class ParseCode {
          return d2+d1;
     }
 
+    public static void parseSceneRemark(String FlieName) {
+        try {
+            /*
+             * 注意：获取流的方式通过openFileInput函数，指定文件名以及后缀
+             * 参数1.文件名和后缀        2.文件模式
+             * 保存在手机data/data/包名/files
+             * */
+            FileInputStream fis = new FileInputStream(FlieName);
+            InputStreamReader is = new InputStreamReader(fis, "UTF-8");
+            //fis.available()文件可用长度
+            char input[] = new char[fis.available()];
+            is.read(input);
+
+            if (fis.available() == 0) {
+                String buff =String.valueOf(input);
+                is.close();
+                fis.close();
+                int leng = buff.length() ;
+                String substring ;
+                StringBuffer inde = new StringBuffer(3);
+                for (int i = 0; i < leng; ) {
+                    substring = buff.substring(i, ++i);
+                   // Log.d("this",substring);
+                    if (substring.equals("$") && (leng > i)) {
+                        inde.delete(0,inde.length());
+                        substring = buff.substring(i, ++i);
+                        while (!substring.equals(":")){
+                            inde.append(substring);
+                            substring = buff.substring(i,++i);
+                        }
+                        int index = Integer.parseInt(inde.toString(),10);
+                        if (substring.equals(":") && (leng > i)) {
+                            StringBuffer b = new StringBuffer();
+                            substring = buff.substring(i,++i);
+                            while (!substring.equals("$") && (leng >= i)) {
+
+                                b.append(substring);
+                                if (i == leng){
+                                    substring = buff.substring(i,i++);
+                                }else {
+                                    substring = buff.substring(i, ++i);
+                                }
+                            }
+                            SceneRemark[index - 1] = b.toString();
+
+                            i--;
+                        }
+                    }
+
+                }
+            }
+
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+
+            e.printStackTrace();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+
+    }
+
+    public static void SaveSceneRemark(String FileName ) {
+        try {
+            //将文件数据写到应用的内部存储
+            /*
+             * 注意：获取流的方式通过openFileInput函数，指定文件名以及后缀
+             * 参数1.文件名和后缀        2.文件模式
+             * 保存在手机data/data/包名/files
+             * */
+            config.delete();
+            config = new File(FileName);
+            config.createNewFile();
+            FileOutputStream fos= new FileOutputStream(FileName);
+            OutputStreamWriter osw=new OutputStreamWriter(fos,"UTF-8");
+            StringBuffer Scene = new StringBuffer();
+            for (int i = 0 ; i <vdate.Scenenum ; i++){
+                Scene.append("$").append(i+1).append(":").append(SceneRemark[i]);
+            }
+            osw.write(Scene.toString());
+            //保证输出缓冲区中的所有内容
+            osw.flush();
+            fos.flush();
+            //后打开的先关闭，逐层向内关闭
+            fos.close();
+            osw.close();
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+
+            e.printStackTrace();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+    }
 
  }
 

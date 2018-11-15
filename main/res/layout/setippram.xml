@@ -336,8 +336,8 @@
             android:textAlignment="center"
             android:background="@drawable/spinner_item"
             />
-    </LinearLayout>
 
+    </LinearLayout>
 
 
 </LinearLayout>
