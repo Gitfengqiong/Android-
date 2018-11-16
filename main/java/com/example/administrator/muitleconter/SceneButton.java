@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import static com.example.administrator.muitleconter.SetingActivtiy.Internets;
 import static com.example.administrator.muitleconter.SetingActivtiy.Msid1;
+import static com.example.administrator.muitleconter.SetingActivtiy.Mstatue;
+import static com.example.administrator.muitleconter.SetingActivtiy.Statue;
 
 public class SceneButton extends AppCompatButton {
 
@@ -34,23 +36,49 @@ public class SceneButton extends AppCompatButton {
             //选中当前场景
             Foucse = true ;
             Onstatu =true;
-            //    Log.d("3:","选中输出，等待输入");
-          //  this.setBackgroundColor(Color.parseColor("#11ff11"));
+            if (vdata.IsScene >0 ){
+                SceneButton Scen = (SceneButton) getRootView().findViewById(vdata.IsScene+999);
+                Scen.Foucse = false ;
+                Scen.setBackground(getResources().getDrawable(R.drawable.button_shap2));
+                Scen.setTextColor(Color.parseColor("#ee2233"));
+            }
+            vdata.IsScene = id ;
             this.setBackground(getResources().getDrawable(R.drawable.button_shap_on));
             this.setTextColor(Color.parseColor("#22ee33"));
+            StringBuffer codes ;
+            String leng = "03";
+            codes=new StringBuffer();
+            codes.append(getResources().getString(R.string.Ncode_Begin));
+            codes.append(vdata.devaddrid);
+            codes.append(getResources().getString(R.string.Ncode_Order_SceneGet));
+            codes.append(leng);
+            codes.append("00");
+            if (id <16){
+                String hexnum = Integer.toString(id,16);
+                codes.append("0");
+                codes.append(hexnum);
+            }else if ( id >15){
+                String hexnum = Integer.toString(id,16);
+                codes.append(hexnum);
+            }
+            codes.append("00");
+           // Log.d("Call Scence:",codes.toString());
+            SendCodes(codes.toString());//Call Scene
+            SendStatue();
             return  0 ;
 
         }
         else if (Foucse&&!vdata.SceneStart){
             Foucse =false;
             Onstatu = false;
-           // this.setBackgroundColor(Color.parseColor("#ff1111"));
+            vdata.IsScene = 0;
             this.setBackground(getResources().getDrawable(R.drawable.button_shap2));
             this.setTextColor(Color.parseColor("#ee2233"));
             return  0 ;
         }
         return 1;
     }
+
 
 
     @Override
@@ -75,6 +103,25 @@ public class SceneButton extends AppCompatButton {
 //        canvas.translate(0,(this.getMeasuredHeight()/2) - (int) this.getTextSize());
     }
 
+
+    private  void SendStatue(){
+        Message msg = new Message();
+        msg.what = Mstatue;
+        Statue.sendMessage(msg);
+    }
+
+    public  void SendCodes(String codes){
+
+        try {
+            Message msg = new Message();
+            msg.what = Msid1;
+            msg.obj = codes;
+            assert (Internets.rehandler != null);
+
+            Internets.rehandler.sendMessage(msg);
+        }catch (Exception e){e.printStackTrace();}
+
+    }
 
 
 }

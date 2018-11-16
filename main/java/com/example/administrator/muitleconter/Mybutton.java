@@ -11,13 +11,7 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.widget.AppCompatButton;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.View;
-import android.view.View.OnLongClickListener;
-import android.widget.Button;
-import android.widget.Toast;
-
 import static com.example.administrator.muitleconter.SetingActivtiy.Internets;
-import static com.example.administrator.muitleconter.SetingActivtiy.Mrid1;
 import static com.example.administrator.muitleconter.SetingActivtiy.Msid1;
 import static com.example.administrator.muitleconter.SetingActivtiy.Mstatue;
 import static com.example.administrator.muitleconter.SetingActivtiy.Statue;
@@ -289,7 +283,7 @@ public class Mybutton extends AppCompatButton {
     }
     public static   void SendCodes(String codes){
 
-        Log.d("getip::",Internets.getIp());
+     //   Log.d("getip::",Internets.getIp());
         try {
             Message msg = new Message();
             msg.what = Msid1;

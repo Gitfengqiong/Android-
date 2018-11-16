@@ -17,6 +17,16 @@
         android:textColor="@android:color/holo_orange_dark"
         android:textAlignment="center"
         android:padding="30sp"
-    /> 
 
+        /> 
+
+    <CheckBox
+        android:id="@+id/ch"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:layout_height="match_parent"
+        android:focusable="true"
+        android:checked="false"
+
+        />
 </LinearLayout>

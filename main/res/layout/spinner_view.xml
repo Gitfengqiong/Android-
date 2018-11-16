@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
     <TextView
-        android:id="@+id/txtvwSpinner"
+        android:id="@+id/text1"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:textSize="20sp"
@@ -13,4 +13,5 @@
         android:layout_gravity="center_horizontal|center_vertical"
         android:gravity="center_vertical"
         android:textStyle="bold"/>
+
     </LinearLayout>

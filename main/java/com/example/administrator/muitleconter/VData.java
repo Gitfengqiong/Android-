@@ -25,6 +25,7 @@ public class VData extends Application {
     public int alloutchange ;
     public boolean SceneStart =false;
     public int Scenenum = 16 ;
+    public int IsScene = 0 ;
     public  String code1,code2,code3,code4,code5,code6,code7,code8,code9,code10;
     public  void  setWaiteIn(boolean w){
         waiteIn = w ;

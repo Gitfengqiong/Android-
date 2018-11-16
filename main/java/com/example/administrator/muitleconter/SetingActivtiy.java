@@ -1,35 +1,21 @@
 package com.example.administrator.muitleconter;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.app.TabActivity;
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.os.Vibrator;
-import android.provider.ContactsContract;
 import android.support.annotation.RequiresApi;
-import android.support.v4.content.pm.PermissionInfoCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.telecom.Call;
-import android.text.Editable;
-import android.text.Layout;
-import android.text.TextWatcher;
-import android.transition.Scene;
-import android.util.AttributeSet;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
@@ -49,6 +35,7 @@ import java.util.List;
 import static android.widget.GridLayout.spec;
 import static com.example.administrator.muitleconter.MainActivity.SceneRemark;
 import static com.example.administrator.muitleconter.MainActivity.config;
+import static com.example.administrator.muitleconter.MainActivity.vdate;
 
 //import static com.example.administrator.muitleconter.MainActivity.Internets;
 
@@ -69,6 +56,7 @@ public class SetingActivtiy extends TabActivity {
     private LinearLayout buttonlayot;
     protected static String FileNames ;
     private static  boolean Keyboardon = false ;
+    private static Model checkStatu[]  =new Model[vdate.Scenenum];
     @SuppressLint("HandlerLeak")
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -167,20 +155,31 @@ public class SetingActivtiy extends TabActivity {
             }
         });
 
+
         Spinner Savelist  = findViewById(R.id.SaveScene);
         Spinner Calllist = findViewById(R.id.CallScene);
         List<String> Scenelist  = new ArrayList<String>();
         for (int i=1 ;i<=vdata.Scenenum; i++){
             Scenelist.add("场景"+String.valueOf(i));
         }
+
+        for (int i=0 ;i<vdata.Scenenum; i++){
+            checkStatu[i]= new Model();
+            checkStatu[i].setIscheck(false);
+        }
         Scenelist.add("请选择：");
         SceneArrayAdapter<String> adapter;
-        adapter = new SceneArrayAdapter<String>(this,R.layout.spinner_view, R.id.txtvwSpinner , Scenelist);
+        adapter = new SceneArrayAdapter<String>(this,R.layout.spinner_view, R.id.text1 , Scenelist );
         adapter.setDropDownViewResource(R.layout.spinner_drop);
+        SceneArrayAdapter_check<String> adapter1;
+        adapter1 = new SceneArrayAdapter_check<String>(this,R.layout.spinner_view, R.id.text1 , Scenelist, checkStatu);
+        adapter1.setDropDownViewResource(R.layout.spinner_drop_check);
+        Calllist.setAdapter(adapter1);
         Savelist.setAdapter(adapter);
-        Calllist.setAdapter(adapter);
         Savelist.setSelection(Scenelist.size()-1,true);
         Calllist.setSelection(Scenelist.size()-1,true);
+        CheckBox cb = findViewById(R.id.ch);
+
         Savelist.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 
             @Override
@@ -208,6 +207,7 @@ public class SetingActivtiy extends TabActivity {
                 Log.d("Save Scence:",codes.toString());
                 SendCodes(codes.toString());//Set Scene
                 SendStatue();
+
             }
 
             @Override
@@ -215,6 +215,7 @@ public class SetingActivtiy extends TabActivity {
                 // TODO Auto-generated method stub
 
             }
+
         });
 
         Calllist.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -223,7 +224,12 @@ public class SetingActivtiy extends TabActivity {
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
 
-                position+=1;
+
+                Log.d("this:",String.valueOf(position));
+                for (int i = 0 ;i<16 ; i++){
+                    Log.d("v:",String.valueOf(checkStatu[i].ischeck()));
+                }
+               /**** V1.4 Code**********
                 StringBuffer codes ;
                 String leng = "03";
                 codes=new StringBuffer();
@@ -244,6 +250,8 @@ public class SetingActivtiy extends TabActivity {
                 Log.d("Call Scence:",codes.toString());
                 SendCodes(codes.toString());//Call Scene
                 SendStatue();
+
+                *******/
 
             }
 
@@ -327,7 +335,7 @@ public class SetingActivtiy extends TabActivity {
                         vdata.LoginOk = true;
                         ParseCode.Parsecode(data);
                         vdata.ReCode = vdata.code4;
-                    //    Log.d("Re",vdata.ReCode);
+                        Log.d("Re",vdata.ReCode);
                         break;
                     }
                     default: {
@@ -559,6 +567,10 @@ public class SetingActivtiy extends TabActivity {
         int Snum = vdata.Scenenum ;
         vibrator.vibrate(70);
         int d1=0 , d2=0;
+        /*
+         * V1.4 code*
+         *
+
         for (int i=0 ; i<Snum ; i++){
             SceneButton isscen = findViewById(1000+i);
 
@@ -638,6 +650,94 @@ public class SetingActivtiy extends TabActivity {
             }
 
         }
+*/
+        boolean IshaveScene = false ;
+
+        for (int i =0;i<vdata.Scenenum;i++ ){
+            IshaveScene= IshaveScene||checkStatu[i].ischeck();
+            if (checkStatu[i].ischeck()){
+                int scene = i+1;
+                if (scene <9){
+                    switch (scene){
+                        case 1 : {
+                            d1 = d1 | 0x00000001;
+                            continue;
+                        }
+                        case 2:{
+                            d1 = d1 | 0x00000002;
+                            continue;
+                        }
+                        case 3:{
+                            d1 = d1 | 0x00000004;
+                            continue;
+                        }
+                        case 4:{
+                            d1 = d1 | 0x00000008;
+                            continue;
+                        }
+                        case 5:{
+                            d1 = d1 | 0x00000010;
+                            continue;
+                        }
+                        case 6:{
+                            d1 = d1 | 0x00000020;
+                            continue;
+                        }
+                        case 7:{
+                            d1 = d1 | 0x00000040;
+                            continue;
+                        }
+                        case 8:{
+                            d1 = d1 | 0x00000080;
+                            continue;
+                        }
+                    }
+                }
+                if (scene <17){
+                    switch (scene){
+                        case 9 : {
+                            d2 = d2 | 0x00000001;
+                            continue;
+                        }
+                        case 10:{
+                            d2 = d2 | 0x00000002;
+                            continue;
+                        }
+                        case 11:{
+                            d2 = d2 | 0x00000004;
+                            continue;
+                        }
+                        case 12:{
+                            d2 = d2 | 0x00000008;
+                            continue;
+                        }
+                        case 13:{
+                            d2 = d2 | 0x00000010;
+                            continue;
+                        }
+                        case 14:{
+                            d2 = d2 | 0x00000020;
+                            continue;
+                        }
+                        case 15:{
+                            d2 = d2 | 0x00000040;
+                            continue;
+                        }
+                        case 16:{
+                            d2 = d2 | 0x00000080;
+                            continue;
+                        }
+                    }
+                }
+
+            }
+
+
+        }
+        if (!IshaveScene){
+            Toast.makeText(getBaseContext(),"请设置场景循环号后再启动循环",Toast.LENGTH_LONG).show();
+            return;
+        }
 
         StringBuffer codes ;
         String leng = "04";
@@ -666,7 +766,7 @@ public class SetingActivtiy extends TabActivity {
         }
 
         codes.append("00");
-       // Log.d("Scence:",codes.toString());
+        Log.d("Scence:",codes.toString());
         SendCodes(codes.toString());//Set Scene Lopper Number
         synchronized (this) {
             try {
@@ -712,7 +812,7 @@ public class SetingActivtiy extends TabActivity {
         }catch (Exception e){e.printStackTrace();}
 
     }
-    private static void SendStatue(){
+    public static void SendStatue(){
         Message msg = new Message();
         msg.what = Mstatue;
         Statue.sendMessage(msg);
@@ -730,6 +830,12 @@ public class SetingActivtiy extends TabActivity {
         Toast.makeText(getBaseContext(),"场景循环关闭...",Toast.LENGTH_SHORT).show();
         SendStatue();
     }
+    interface AllCheckListener {
+        void onCheckedChanged(boolean b);
+    }
 
 
+    public void Clike(View view){
+        Log.d("oK","cheak");
+    }
 }
