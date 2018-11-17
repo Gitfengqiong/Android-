@@ -24,7 +24,7 @@ public class MyUdpIo implements Runnable {
         private  int diverport = 4068;
         private  int Mreid;
         private  int Mseid;
-        byte Data[]=new byte[15];
+        byte Data[]=new byte[255];
         private static final char[] HEX_CHAR = {'0', '1', '2', '3', '4', '5',
             '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'};
         public MyUdpIo(Handler handler){

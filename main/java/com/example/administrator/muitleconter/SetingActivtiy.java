@@ -1,7 +1,9 @@
 package com.example.administrator.muitleconter;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.TabActivity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
@@ -41,7 +43,7 @@ import static com.example.administrator.muitleconter.MainActivity.vdate;
 
 
 public class SetingActivtiy extends TabActivity {
-    private static VData vdata ;
+    protected static VData vdata ;
     private Vibrator vibrator ;
     private GridLayout id;
     private  GridLayout ido;
@@ -52,11 +54,13 @@ public class SetingActivtiy extends TabActivity {
     protected static final int Mrid1 = 0x140;
     protected static MyUdpIo Internets ;
     protected static final int Mstatue = 0x230;
+    protected static final int MReview = 0x260;
     protected static Handler Statue ;
     private LinearLayout buttonlayot;
     protected static String FileNames ;
     private static  boolean Keyboardon = false ;
     private static Model checkStatu[]  =new Model[vdate.Scenenum];
+    private static Handler review;
     @SuppressLint("HandlerLeak")
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -277,6 +281,7 @@ public class SetingActivtiy extends TabActivity {
             }
         }.start();
 
+        review = new Handler();
         MyHandler handler = new MyHandler(this);
        Internets = new MyUdpIo(handler,vdata.Thisip,Mrid1,Msid1);
        new Thread(Internets).start();
@@ -287,10 +292,10 @@ public class SetingActivtiy extends TabActivity {
                 synchronized (this) {
                     if (msg.what == Mstatue) {
                         try {
-                            wait(1000);
+                            wait(700);
                              if(vdata.ReCode.equals("null")){
                         Toast.makeText(getBaseContext(),"设备无响应",Toast.LENGTH_SHORT).show();
-                            }else if(vdata.ReCode.equals("55")) {
+                            }else if(vdata.ReCode.equals("55")||vdata.ReCode.equals(vdata.vtype)) {
                                  vdata.ReCode ="null";
                                  Toast.makeText(getBaseContext(),"操作成功",Toast.LENGTH_SHORT).show();
 
@@ -302,13 +307,60 @@ public class SetingActivtiy extends TabActivity {
                         }
 
                     }
+
+                    if (msg.what == MReview){
+                        vdata.ReCode = "55";
+                        post(Refreshview);
+                    }
                 }
 
             }
         })).start();
 
+        final Activity my  =this;
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                synchronized (this){
+                    try {
+                        wait(200);
+                        Refresh.GetChanngeStatue(vdata.outleng,my);
+                        wait(200);
+                      //  Refresh.Refresh_view(my);
+                        review.post(Refreshview);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        }).start();
 
     }
+
+    Runnable Refreshview =new Runnable() {
+        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+        @Override
+        public void run() {
+            int Num = Integer.parseInt(vdata.code[3],16)-2;
+            for (int i=0 ; i<Num ; i++){
+                int Outid =Integer.parseInt(vdata.code[i+5]);
+                i++;
+                int InNum = Integer.parseInt(vdata.code[i+5],16)+1;
+                Mybutton out = (Mybutton)findViewById(800+Outid);
+                out.setFoucse(true);
+                out.setOutOK(true);
+                vdata.setOutchannge(out.getMyId());
+                vdata.setWaiteIn(false);
+                out.setText(InNum+"->"+vdata.getOutchannge());
+                out.setBackground(getResources().getDrawable(R.drawable.button_shap_on));
+                out.setTextColor(Color.parseColor("#22ee33"));
+            }
+
+
+        }
+    };
 
     @Override
     protected void onDestroy() {
@@ -334,8 +386,8 @@ public class SetingActivtiy extends TabActivity {
                         String data = msg.obj.toString();
                         vdata.LoginOk = true;
                         ParseCode.Parsecode(data);
-                        vdata.ReCode = vdata.code4;
-                        Log.d("Re",vdata.ReCode);
+                        vdata.ReCode = vdata.code[4];
+                      //  Log.d("Re",vdata.ReCode);
                         break;
                     }
                     default: {
@@ -736,6 +788,7 @@ public class SetingActivtiy extends TabActivity {
         }
         if (!IshaveScene){
             Toast.makeText(getBaseContext(),"请设置场景循环号后再启动循环",Toast.LENGTH_LONG).show();
+            vdata.SceneStart =false ;
             return;
         }
 
@@ -830,12 +883,7 @@ public class SetingActivtiy extends TabActivity {
         Toast.makeText(getBaseContext(),"场景循环关闭...",Toast.LENGTH_SHORT).show();
         SendStatue();
     }
-    interface AllCheckListener {
-        void onCheckedChanged(boolean b);
-    }
 
 
-    public void Clike(View view){
-        Log.d("oK","cheak");
-    }
+
 }

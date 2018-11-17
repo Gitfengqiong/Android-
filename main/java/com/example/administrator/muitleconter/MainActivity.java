@@ -113,7 +113,7 @@ public class MainActivity extends Activity {
                                     vdata.my_ethernet_address = iPlist[arg2].my_ethernet_address.toCharArray();
                                 }else {
                                     Toast.makeText(getBaseContext(),"新版本设备",Toast.LENGTH_LONG).show();
-                                    vdate.my_ethernet_address = (vdate.code5+vdate.code6+vdate.code7+vdate.code8+vdate.code9+vdate.code10).toCharArray();
+                                    vdate.my_ethernet_address = (vdate.code[5]+vdate.code[6]+vdate.code[7]+vdate.code[8]+vdate.code[9]+vdate.code[10]).toCharArray();
                                 }
                                 Looper.loop();
                             } catch (InterruptedException e) {
@@ -323,10 +323,10 @@ public class MainActivity extends Activity {
             public void run() {
                 ipin.setText("");
                 vdate.Thisip =Internet.getIp();
-                vdate.devaddrid = vdate.code1;
-                vdate.vtype = vdate.code5;
-                vdate.inleng = Integer.parseInt(vdate.code7,16);
-                vdate.outleng =  Integer.parseInt(vdate.code8,16);
+                vdate.devaddrid = vdate.code[1];
+                vdate.vtype = vdate.code[5];
+                vdate.inleng = Integer.parseInt(vdate.code[7],16);
+                vdate.outleng =  Integer.parseInt(vdate.code[8],16);
                 Intent intent = new Intent(MainActivity.this, SetingActivtiy.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
@@ -340,10 +340,10 @@ public class MainActivity extends Activity {
 
             if (vdate.LoginOk) {
                 vdate.Thisip =Internet.getIp();
-                vdate.devaddrid = vdate.code1;
-                vdate.vtype = vdate.code5;
-                vdate.inleng = Integer.parseInt(vdate.code7,16);
-                vdate.outleng =  Integer.parseInt(vdate.code8,16);
+                vdate.devaddrid = vdate.code[1];
+                vdate.vtype = vdate.code[5];
+                vdate.inleng = Integer.parseInt(vdate.code[7],16);
+                vdate.outleng =  Integer.parseInt(vdate.code[8],16);
                 Intent intent = new Intent(MainActivity.this, SetingActivtiy.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
@@ -372,10 +372,10 @@ public class MainActivity extends Activity {
          //   int num =ParseCode.ParseMultiCodes(data);
           //  Log.d("find ip",iPlist[ipIndex-1].m_HostPort);
           //  CreateListView();
-            String s= "BA0103A001130F0F7D";
-            ParseCode.Parsecode(s);
-            vdate.LoginOk =true;
-           runhandler.post(runui);
+          //  String s= "BA0103A001130F0F7D";
+         //   ParseCode.Parsecode(s);
+          //  vdate.LoginOk =true;
+          // runhandler.post(runui);
 
         }else if(ipin.getText().toString().length() <7){
             Toast toast = Toast.makeText(this,"地址错误",Toast.LENGTH_SHORT);
@@ -406,7 +406,7 @@ public class MainActivity extends Activity {
 
                                     }else {
                                        // Toast.makeText(getBaseContext(),"",Toast.LENGTH_LONG).show();
-                                        vdate.my_ethernet_address = (vdate.code5+vdate.code6+vdate.code7+vdate.code8+vdate.code9+vdate.code10).toCharArray();
+                                        vdate.my_ethernet_address = (vdate.code[5]+vdate.code[6]+vdate.code[7]+vdate.code[8]+vdate.code[9]+vdate.code[10]).toCharArray();
                                         NewD = true ;
                                         Log.d("ID",vdate.my_ethernet_address.toString());
                                     }
@@ -439,7 +439,7 @@ public class MainActivity extends Activity {
                                         runhandler.post(runui);
                                         podia.dismiss();
                                     } else if (!vdate.LoginOk) {
-                                        vdate.my_ethernet_address = (vdate.code5+vdate.code6+vdate.code7+vdate.code8+vdate.code9+vdate.code10).toCharArray();
+                                        vdate.my_ethernet_address = (vdate.code[5]+vdate.code[6]+vdate.code[7]+vdate.code[8]+vdate.code[9]+vdate.code[10]).toCharArray();
                                         /*
                                         String my = "ff";
                                         int num = Integer.parseInt(my,16);
@@ -522,11 +522,9 @@ public class MainActivity extends Activity {
                     case Mrid:
                         // do something...
                     {
-                        Log.d("Main收到数据", msg.obj.toString());
+                   //     Log.d("Main收到数据", msg.obj.toString());
                         String data = msg.obj.toString();
-
-                       ParseCode.Parsecode(data);
-
+                        ParseCode.Parsecode(data);
                        vdate.LoginOk = true;
                         break;
                     }

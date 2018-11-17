@@ -45,6 +45,7 @@ public class ParseCode {
                    //      Log.d("break code j:", valueOf(j));
                          break;
                      }
+                     /*
                      switch (mode) {
                          case 1: {
                              vdate.code1 = valueOf(substring);
@@ -132,6 +133,9 @@ public class ParseCode {
                              continue;
                      }
 
+*/
+
+                     vdate.code[mode++] =valueOf(substring);
                      j++;
                      i = j + 3;
                  }
@@ -163,7 +167,7 @@ public class ParseCode {
                             //数据区
                             //Mac Address
                            // ipIndex = 0 ;
-                             Log.d("Subs1:", substring);
+                      //       Log.d("Subs1:", substring);
                            String Mac = data.substring(i,i+=6*offset);
                            if (Debug.Endebug){
                                Log.d("Codes:",Mac);
@@ -420,6 +424,17 @@ public class ParseCode {
 
             e.printStackTrace();
         }
+    }
+
+    public static String IntToNetByte(int num){
+       StringBuffer netbyte =new StringBuffer() ;
+       if (num<16){
+           netbyte.append("0");
+           netbyte.append(Integer.toString(num,16));
+       }else {
+           netbyte.append(Integer.toString(num,16));
+       }
+       return netbyte.toString();
     }
 
  }

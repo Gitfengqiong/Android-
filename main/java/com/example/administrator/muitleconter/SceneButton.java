@@ -12,6 +12,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import static com.example.administrator.muitleconter.SetingActivtiy.Internets;
+import static com.example.administrator.muitleconter.SetingActivtiy.MReview;
 import static com.example.administrator.muitleconter.SetingActivtiy.Msid1;
 import static com.example.administrator.muitleconter.SetingActivtiy.Mstatue;
 import static com.example.administrator.muitleconter.SetingActivtiy.Statue;
@@ -64,7 +65,17 @@ public class SceneButton extends AppCompatButton {
             codes.append("00");
            // Log.d("Call Scence:",codes.toString());
             SendCodes(codes.toString());//Call Scene
-            SendStatue();
+            synchronized (this){
+                try {
+                    wait(200);
+                    SendRefresh();
+                    wait(500);
+                    SendStatue();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+
             return  0 ;
 
         }
@@ -107,6 +118,12 @@ public class SceneButton extends AppCompatButton {
     private  void SendStatue(){
         Message msg = new Message();
         msg.what = Mstatue;
+        Statue.sendMessage(msg);
+    }
+
+    private void SendRefresh(){
+        Message msg = new Message();
+        msg.what = MReview;
         Statue.sendMessage(msg);
     }
 

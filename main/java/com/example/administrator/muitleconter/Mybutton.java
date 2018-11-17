@@ -5,16 +5,14 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Build;
-import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
 import android.support.v7.widget.AppCompatButton;
-import android.util.AttributeSet;
 import android.util.Log;
-import static com.example.administrator.muitleconter.SetingActivtiy.Internets;
-import static com.example.administrator.muitleconter.SetingActivtiy.Msid1;
 import static com.example.administrator.muitleconter.SetingActivtiy.Mstatue;
+import static com.example.administrator.muitleconter.SetingActivtiy.SendCodes;
 import static com.example.administrator.muitleconter.SetingActivtiy.Statue;
+import static com.example.administrator.muitleconter.SetingActivtiy.vdata;
 
 
 public class Mybutton extends AppCompatButton {
@@ -29,8 +27,6 @@ public class Mybutton extends AppCompatButton {
 
     }
     private int statu ;//状态1 in 0 out
-
-
 
     public int  getStatu(){
         return statu;
@@ -281,6 +277,7 @@ public class Mybutton extends AppCompatButton {
         }
         return 1;
     }
+    /*
     public static   void SendCodes(String codes){
 
      //   Log.d("getip::",Internets.getIp());
@@ -294,7 +291,7 @@ public class Mybutton extends AppCompatButton {
         }catch (Exception e){e.printStackTrace();}
 
     }
-
+*/
 
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public boolean setOnLong(VData vdata) {
@@ -392,4 +389,6 @@ public class Mybutton extends AppCompatButton {
         msg.what = Mstatue;
         Statue.sendMessage(msg);
     }
+
+
 }
