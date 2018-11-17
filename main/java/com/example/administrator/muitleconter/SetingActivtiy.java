@@ -37,6 +37,8 @@ import java.util.List;
 import static android.widget.GridLayout.spec;
 import static com.example.administrator.muitleconter.MainActivity.SceneRemark;
 import static com.example.administrator.muitleconter.MainActivity.config;
+import static com.example.administrator.muitleconter.MainActivity.config_in;
+import static com.example.administrator.muitleconter.MainActivity.config_out;
 import static com.example.administrator.muitleconter.MainActivity.vdate;
 
 //import static com.example.administrator.muitleconter.MainActivity.Internets;
@@ -58,9 +60,13 @@ public class SetingActivtiy extends TabActivity {
     protected static Handler Statue ;
     private LinearLayout buttonlayot;
     protected static String FileNames ;
+    protected static String InFileNames;
+    protected static String OutFileNames;
     private static  boolean Keyboardon = false ;
     private static Model checkStatu[]  =new Model[vdate.Scenenum];
     private static Handler review;
+    protected static String ChanngRemark_in[] ;
+    protected static String ChanngeRemark_out[] ;
     @SuppressLint("HandlerLeak")
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -84,13 +90,24 @@ public class SetingActivtiy extends TabActivity {
         Datas.setWaiteIn(false);
         Datas.ReCode = "55";
         vdata =Datas;
+        ChanngRemark_in = new String[vdata.inleng];
+        ChanngeRemark_out = new String[vdata.outleng];
         Createview(vdata.inleng,vdata.outleng);
         CreateScene(vdata.Scenenum);
 
         for (int i = 0 ; i<vdata.Scenenum ; i++){
             SceneRemark[i] = "null";
         }
-       FileNames =  this.getFilesDir().getPath()+String.valueOf(vdata.my_ethernet_address)+".cfg";
+        for (int i = 0 ; i<vdata.inleng ; i++){
+            ChanngRemark_in[i] = "null";
+        }
+        for (int i = 0 ; i<vdata.outleng ; i++){
+            ChanngeRemark_out[i] = "null";
+        }
+        FileNames =  this.getFilesDir().getPath()+String.valueOf(vdata.my_ethernet_address)+".cfg";
+        InFileNames =  this.getFilesDir().getPath()+String.valueOf(vdata.my_ethernet_address)+"In.cfg";
+        OutFileNames =  this.getFilesDir().getPath()+String.valueOf(vdata.my_ethernet_address)+"Out.cfg";
+
         config = new File(FileNames);
         if(!config.exists())
         {
@@ -98,7 +115,7 @@ public class SetingActivtiy extends TabActivity {
                 //文件不存在，就创建一个新文件
                 config.createNewFile();
                  //  System.out.println("文件已经创建了");
-                Toast.makeText(this,"New Device",Toast.LENGTH_SHORT);
+                Toast.makeText(this,"New Device",Toast.LENGTH_SHORT).show();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -114,7 +131,35 @@ public class SetingActivtiy extends TabActivity {
          //   System.out.println("文件是否可读："+config.canRead());
           //   System.out.println("文件是否可写："+config.canWrite());
             // System.out.println("我呢间是否隐藏："+file.isHidden());
+
         }
+
+        config_in = new File(InFileNames);
+        if(!config_in.exists())
+        {
+            try {
+                //文件不存在，就创建一个新文件
+                config_in.createNewFile();
+                //  System.out.println("文件已经创建了");
+                Toast.makeText(this,"New Device",Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        config_out = new File(OutFileNames);
+        if(!config_out.exists())
+        {
+            try {
+                //文件不存在，就创建一个新文件
+                config_out.createNewFile();
+                //  System.out.println("文件已经创建了");
+                Toast.makeText(this,"New Device",Toast.LENGTH_SHORT).show();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
 
         SeekBar seekBar = (SeekBar) findViewById(R.id.progress);
         final TextView textView = (TextView) findViewById(R.id.text1);
@@ -281,6 +326,36 @@ public class SetingActivtiy extends TabActivity {
             }
         }.start();
 
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                ParseCode.parseChanngeRemark(InFileNames,ChanngRemark_in);
+                for (int i = 0 ; i<vdata.inleng ; i++){
+                    Mybutton button = findViewById(600+i);
+                    if (!ChanngRemark_in[i].equals("null")&&!ChanngRemark_in[i].equals("")){
+                        button.Remark = ChanngRemark_in[i];
+                    }
+
+                }
+            }
+        }.start();
+
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                ParseCode.parseChanngeRemark(OutFileNames,ChanngeRemark_out);
+                for (int i = 0 ; i<vdata.outleng ; i++){
+                    Mybutton button = findViewById(800+i);
+                    if (!ChanngeRemark_out[i].equals("null")&&!ChanngeRemark_out[i].equals("")){
+                        button.Remark = ChanngeRemark_out[i];
+                    }
+
+                }
+            }
+        }.start();
+
         review = new Handler();
         MyHandler handler = new MyHandler(this);
        Internets = new MyUdpIo(handler,vdata.Thisip,Mrid1,Msid1);
@@ -410,15 +485,20 @@ public class SetingActivtiy extends TabActivity {
             is.setId(ids);
             ((Mybutton) is).SetButtonid(ids);
             ((Mybutton) is).setMyId(i+1);
+            buttonlayot = new LinearLayout(getBaseContext());
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            buttonlayot.setOrientation(LinearLayout.VERTICAL);
+            layoutParams.setMargins(0, 0, 0, 0);
+
             GridLayout.LayoutParams param= new GridLayout.LayoutParams(spec(
                     GridLayout.UNDEFINED,GridLayout.FILL,1f),
                     spec(GridLayout.UNDEFINED,GridLayout.FILL,1f));
             param.setMargins(3,3,3,3);
-            is.setLayoutParams(param);
-            is.setHeight(200);
+            is.setLayoutParams(layoutParams);
+            buttonlayot.setLayoutParams(param);
+            buttonlayot.setBackground(getResources().getDrawable(R.drawable.button_shap2));
+            is.setHeight(150);
             is.setTextSize(30);
-          //  is.setBackgroundColor(Color.parseColor("#ff1111"));
-            is.setBackground(getResources().getDrawable(R.drawable.button_shap2));
             is.setOnClickListener(new View.OnClickListener() {
                                       @Override
                                       public void onClick(View v) {
@@ -436,9 +516,65 @@ public class SetingActivtiy extends TabActivity {
                                           }
                                       }
             );
+
+            buttonlayot.addView(is);
+            final Remark_Edit ise = new Remark_Edit(getBaseContext());
+            ise.Buttonid = ids ;
+            ise.setHint("备注");
+            ise.setHeight(65);
+            //ise.weight();
+            ise.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            ise.setTextColor(Color.parseColor("#33ee11"));
+            buttonlayot.getViewTreeObserver().addOnGlobalLayoutListener(
+                    new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+
+                            Rect r = new Rect();
+                            buttonlayot.getWindowVisibleDisplayFrame(r);
+                            int screenHeight = buttonlayot.getRootView()
+                                    .getHeight();
+                            int heightDifference = screenHeight - (r.bottom);
+                            if (heightDifference > 200) {
+                                //软键盘显示
+                                Keyboardon = true;
+                                //    Log.d("Up","keys");
+// changeKeyboardHeight(heightDifference);
+                            } else if (screenHeight > 20 && heightDifference < 200) {
+                                //软键盘隐藏
+
+                                Keyboardon = false;
+                            }
+
+                        }
+
+                    });
             is.setTextColor(Color.parseColor("#ee2233"));
             ((Mybutton) is).setStatu(1);
-            id.addView(is);
+            ise.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+
+// TODO Auto-generated method stub
+                    if (hasFocus) {
+
+                    }
+                    if (!hasFocus) {
+                        if (Keyboardon){
+                            ise.ChanngeMark_in(600);
+                        }else
+                        if (!Keyboardon){
+                            ise.ChanngeSaveMark_in(600);
+                        }
+                    }
+
+                }
+
+            });
+
+
+            buttonlayot.addView(ise);
+            id.addView(buttonlayot);
 
         }
 
@@ -450,16 +586,22 @@ public class SetingActivtiy extends TabActivity {
             ((Mybutton) is1).SetButtonid(ids);
             is1.setId(ids);
             ((Mybutton) is1).setMyId(i+1);
+
+            buttonlayot = new LinearLayout(getBaseContext());
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+            buttonlayot.setOrientation(LinearLayout.VERTICAL);
+            layoutParams.setMargins(0, 0, 0, 0);
+
             GridLayout.LayoutParams param= new GridLayout.LayoutParams(spec(
                     GridLayout.UNDEFINED,GridLayout.FILL,1f),
                     spec(GridLayout.UNDEFINED,GridLayout.FILL,1f));
             param.setMargins(3,3,3,3);
-            is1.setLayoutParams(param);
+            buttonlayot.setLayoutParams(param);
+            buttonlayot.setBackground(getResources().getDrawable(R.drawable.button_shap2));
+            is1.setHeight(150);
             is1.setTextSize(30);
-            is1.setHeight(200);
-            //is1.setBackgroundColor(Color.parseColor("#ff1111"));
-            is1.setBackground(getResources().getDrawable(R.drawable.button_shap2));
-           // is1.setTextAlignment();
+            is1.setLayoutParams(layoutParams);
+
             is1.setOnClickListener(new View.OnClickListener() {
                                        @Override
                                        public void onClick(View v) {
@@ -471,7 +613,65 @@ public class SetingActivtiy extends TabActivity {
             );
             ((Mybutton) is1).setStatu(0);
             is1.setTextColor(Color.parseColor("#ee2233"));
-            ido.addView(is1);
+            buttonlayot.addView(is1);
+            final Remark_Edit ise = new Remark_Edit(getBaseContext());
+
+            ise.Buttonid = ids ;
+            ise.setHint("备注");
+            ise.setHeight(65);
+            //ise.weight();
+            ise.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            ise.setTextColor(Color.parseColor("#33ee11"));
+            buttonlayot.getViewTreeObserver().addOnGlobalLayoutListener(
+                    new ViewTreeObserver.OnGlobalLayoutListener() {
+                        @Override
+                        public void onGlobalLayout() {
+
+                            Rect r = new Rect();
+                            buttonlayot.getWindowVisibleDisplayFrame(r);
+                            int screenHeight = buttonlayot.getRootView()
+                                    .getHeight();
+                            int heightDifference = screenHeight - (r.bottom);
+                            if (heightDifference > 200) {
+                                //软键盘显示
+                                Keyboardon = true;
+                                //    Log.d("Up","keys");
+// changeKeyboardHeight(heightDifference);
+                            } else if (screenHeight > 20 && heightDifference < 200) {
+                                //软键盘隐藏
+
+                                Keyboardon = false;
+                            }
+
+                        }
+
+                    });
+            ise.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View v, boolean hasFocus) {
+
+// TODO Auto-generated method stub
+                    if (hasFocus) {
+
+                    }
+                    if (!hasFocus) {
+                        if (Keyboardon){
+                            ise.ChanngeMark_out(800);
+                        }else
+                        if (!Keyboardon){
+                            ise.ChanngeSaveMark_out(800);
+                        }
+
+
+                    }
+
+                }
+
+            });
+
+
+            buttonlayot.addView(ise);
+            ido.addView(buttonlayot);
         }
     }
     @SuppressLint("ResourceType")
@@ -496,7 +696,6 @@ public class SetingActivtiy extends TabActivity {
             is.setLayoutParams(layoutParams);
             buttonlayot.setLayoutParams(param);
             buttonlayot.setBackground(getResources().getDrawable(R.drawable.button_shap2));
-            int h = buttonlayot.getHeight();
             is.setHeight(150);
             is.setTextSize(30);
 

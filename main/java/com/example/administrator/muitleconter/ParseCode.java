@@ -12,8 +12,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-
-import static android.content.Context.*;
 import static com.example.administrator.muitleconter.MainActivity.SceneRemark;
 import static com.example.administrator.muitleconter.MainActivity.config;
 import static com.example.administrator.muitleconter.MainActivity.iPlist;
@@ -425,6 +423,109 @@ public class ParseCode {
             e.printStackTrace();
         }
     }
+
+    public static void parseChanngeRemark(String FlieName , String [] data ) {
+        try {
+            /*
+             * 注意：获取流的方式通过openFileInput函数，指定文件名以及后缀
+             * 参数1.文件名和后缀        2.文件模式
+             * 保存在手机data/data/包名/files
+             * */
+            FileInputStream fis = new FileInputStream(FlieName);
+            InputStreamReader is = new InputStreamReader(fis, "UTF-8");
+            //fis.available()文件可用长度
+            char input[] = new char[fis.available()];
+            is.read(input);
+
+            if (fis.available() == 0) {
+                String buff =String.valueOf(input);
+                is.close();
+                fis.close();
+                int leng = buff.length() ;
+                String substring ;
+                StringBuffer inde = new StringBuffer(3);
+                for (int i = 0; i < leng; ) {
+                    substring = buff.substring(i, ++i);
+                    // Log.d("this",substring);
+                    if (substring.equals("$") && (leng > i)) {
+                        inde.delete(0,inde.length());
+                        substring = buff.substring(i, ++i);
+                        while (!substring.equals(":")){
+                            inde.append(substring);
+                            substring = buff.substring(i,++i);
+                        }
+                        int index = Integer.parseInt(inde.toString(),10);
+                        if (substring.equals(":") && (leng > i)) {
+                            StringBuffer b = new StringBuffer();
+                            substring = buff.substring(i,++i);
+                            while (!substring.equals("$") && (leng >= i)) {
+
+                                b.append(substring);
+                                if (i == leng){
+                                    substring = buff.substring(i,i++);
+                                }else {
+                                    substring = buff.substring(i, ++i);
+                                }
+                            }
+                            data[index - 1] = b.toString();
+
+                            i--;
+                        }
+                    }
+
+                }
+            }
+
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+
+            e.printStackTrace();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public static void SaveChanngeRemark(String FileName ,String[] data , File flies , int dataNum) {
+        try {
+            //将文件数据写到应用的内部存储
+            /*
+             * 注意：获取流的方式通过openFileInput函数，指定文件名以及后缀
+             * 参数1.文件名和后缀        2.文件模式
+             * 保存在手机data/data/包名/files
+             * */
+            flies.delete();
+            flies = new File(FileName);
+            flies.createNewFile();
+            FileOutputStream fos= new FileOutputStream(FileName);
+            OutputStreamWriter osw=new OutputStreamWriter(fos,"UTF-8");
+            StringBuffer Scene = new StringBuffer();
+            for (int i = 0 ; i <dataNum ; i++){
+                Scene.append("$").append(i+1).append(":").append(data[i]);
+            }
+            osw.write(Scene.toString());
+            //保证输出缓冲区中的所有内容
+            osw.flush();
+            fos.flush();
+            //后打开的先关闭，逐层向内关闭
+            fos.close();
+            osw.close();
+        } catch (FileNotFoundException e) {
+
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+
+            e.printStackTrace();
+        } catch (IOException e) {
+
+            e.printStackTrace();
+        }
+    }
+
 
     public static String IntToNetByte(int num){
        StringBuffer netbyte =new StringBuffer() ;

@@ -47,7 +47,10 @@ public class MainActivity extends Activity {
     private static List<Map<String,Object>> listitems;
     private static String IP;
     protected static File config ;
+    protected static File config_in ;
+    protected static File config_out ;
     protected static String SceneRemark[] ;
+
     private static boolean  NewD = false;
     //private static String debugs;
    // private static EditText e;
@@ -70,6 +73,8 @@ public class MainActivity extends Activity {
         final VData vdata = (VData) getApplication();
         vdate = vdata;
         SceneRemark = new String[vdate.Scenenum];
+
+
          //e = findViewById(R.id.beugs);
        multicast = new Multicast(this.getResources().getString(R.string.Multi_ip),Integer.parseInt((getResources().getString(R.string.Multi_port))
        ),handler,MMrid,MMsid,this.getResources().getString(R.string.Ncode_FindDev));
