@@ -98,7 +98,6 @@ public class MainActivity extends Activity {
                // String content=map.get("itemContent");
                 Toast.makeText(getApplicationContext(),
                         "链接："+IP+"中...",Toast.LENGTH_SHORT).show();
-            //    podia = ProgressDialog.show(getBaseContext(), "连接设备", "正在连接中...请稍等", false, true);
                 Internet.setIp(IP);
                 vdata.LoginOk =false ;
                 Message callMac  = new Message() ;
@@ -111,7 +110,7 @@ public class MainActivity extends Activity {
                         super.run();
                         synchronized (this){
                             try {
-                                wait(300);
+                                wait(200);
                                 Looper.prepare();
                                 if(!vdate.LoginOk){
                                     Toast.makeText(getBaseContext(),"旧版本设备",Toast.LENGTH_LONG).show();
@@ -120,6 +119,7 @@ public class MainActivity extends Activity {
                                     Toast.makeText(getBaseContext(),"新版本设备",Toast.LENGTH_LONG).show();
                                     vdate.my_ethernet_address = (vdate.code[5]+vdate.code[6]+vdate.code[7]+vdate.code[8]+vdate.code[9]+vdate.code[10]).toCharArray();
                                 }
+
                                 Looper.loop();
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -128,14 +128,16 @@ public class MainActivity extends Activity {
                     }
                 }.start();
 
-              //  podia1 = ProgressDialog.show(getBaseContext(), "连接设备", "正在连接中...请稍等", false, true);
+
+
+
                 new Thread(){
                     @Override
                     public void run() {
                         super.run();
                         synchronized (this){
                             try {
-                                wait(700);
+                                wait(500);
                                 vdata.LoginOk=false;
                                 Internet.setMreid(Mrid);
                                 Internet.setMseid(Msid);
@@ -145,7 +147,7 @@ public class MainActivity extends Activity {
                                 //  msg.obj =String.valueOf(m);
                                 msg.obj = m;
                                 Internet.rehandler.sendMessage(msg);
-                                wait(200);
+                                wait(1200);
                                 runhandler.post(beug);
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -355,7 +357,6 @@ public class MainActivity extends Activity {
 
 
             } else if (!vdate.LoginOk) {
-             //   podia1.dismiss();
                 Toast.makeText(getBaseContext(),"连接超时",Toast.LENGTH_SHORT).show();
             }
 
@@ -413,7 +414,7 @@ public class MainActivity extends Activity {
                                        // Toast.makeText(getBaseContext(),"",Toast.LENGTH_LONG).show();
                                         vdate.my_ethernet_address = (vdate.code[5]+vdate.code[6]+vdate.code[7]+vdate.code[8]+vdate.code[9]+vdate.code[10]).toCharArray();
                                         NewD = true ;
-                                        Log.d("ID",vdate.my_ethernet_address.toString());
+                                    //    Log.d("ID",vdate.my_ethernet_address.toString());
                                     }
                                     Looper.loop();
                                 }
@@ -443,7 +444,7 @@ public class MainActivity extends Activity {
                                       //  vdate.my_ethernet_address = (vdate.code5+vdate.code6+vdate.code7+vdate.code8+vdate.code9+vdate.code10).toCharArray();
                                         runhandler.post(runui);
                                         podia.dismiss();
-                                    } else if (!vdate.LoginOk) {
+                                    } else if (!vdate.LoginOk||!NewD) {
                                         vdate.my_ethernet_address = (vdate.code[5]+vdate.code[6]+vdate.code[7]+vdate.code[8]+vdate.code[9]+vdate.code[10]).toCharArray();
                                         /*
                                         String my = "ff";
@@ -455,6 +456,8 @@ public class MainActivity extends Activity {
                                         podia.dismiss();//runhandler.post(runui);
                                         Looper.prepare();
                                         Toast.makeText(getBaseContext(),"链接超时",Toast.LENGTH_LONG).show();
+                                        vdate.my_ethernet_address ="AcBca".toCharArray();
+                                        runhandler.post(beug);
                                         Looper.loop();
                                     }
                                 }
@@ -527,7 +530,7 @@ public class MainActivity extends Activity {
                     case Mrid:
                         // do something...
                     {
-                   //     Log.d("Main收到数据", msg.obj.toString());
+                      //  Log.d("Main收到数据", msg.obj.toString());
                         String data = msg.obj.toString();
                         ParseCode.Parsecode(data);
                        vdate.LoginOk = true;

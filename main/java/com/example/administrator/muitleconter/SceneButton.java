@@ -66,10 +66,11 @@ public class SceneButton extends AppCompatButton {
            // Log.d("Call Scence:",codes.toString());
             SendCodes(codes.toString());//Call Scene
             synchronized (this){
-                try {
-                    wait(200);
+                try {wait(200);
+                    Refresh.GetChanngeStatue(vdata.outleng);
+                    wait(300);
                     SendRefresh();
-                    wait(500);
+                    wait(300);
                     SendStatue();
                 } catch (InterruptedException e) {
                     e.printStackTrace();

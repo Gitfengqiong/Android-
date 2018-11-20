@@ -20,7 +20,7 @@ public class Refresh {
     public static void Refresh_view(Activity base){
         int Num = Integer.parseInt(vdata.code[3],16)-2;
         for (int i=0 ; i<Num ; i++){
-            int Outid =Integer.parseInt(vdata.code[i+5]);
+            int Outid =Integer.parseInt(vdata.code[i+5],16);
             i++;
             int InNum = Integer.parseInt(vdata.code[i+5],16)+1;
             Mybutton out = (Mybutton)base.findViewById(800+Outid);
@@ -34,7 +34,7 @@ public class Refresh {
 
     }
 
-    public static void GetChanngeStatue(int MaxNum , Activity base){
+    public static void GetChanngeStatue(int MaxNum ){
         StringBuffer codes = new StringBuffer();
         codes.delete(0,codes.length());
         codes.append("BA");

@@ -3,6 +3,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.TabActivity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -41,8 +42,6 @@ import static com.example.administrator.muitleconter.MainActivity.config_in;
 import static com.example.administrator.muitleconter.MainActivity.config_out;
 import static com.example.administrator.muitleconter.MainActivity.vdate;
 
-//import static com.example.administrator.muitleconter.MainActivity.Internets;
-
 
 public class SetingActivtiy extends TabActivity {
     protected static VData vdata ;
@@ -50,7 +49,6 @@ public class SetingActivtiy extends TabActivity {
     private GridLayout id;
     private  GridLayout ido;
     private GridLayout Scenel;
-   // private  MyUdpIo Internets ;
     private Message msg;
     protected static final int Msid1 = 0x130;
     protected static final int Mrid1 = 0x140;
@@ -67,9 +65,9 @@ public class SetingActivtiy extends TabActivity {
     private static Handler review;
     protected static String ChanngRemark_in[] ;
     protected static String ChanngeRemark_out[] ;
+    protected   int Outbid = 0 ;
+
     @SuppressLint("HandlerLeak")
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR1)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -83,17 +81,20 @@ public class SetingActivtiy extends TabActivity {
         ido = (GridLayout) findViewById(R.id.Tab1out);
         Scenel = findViewById(R.id.Scenel);
 
-       // buttonlayot = findViewById(R.id.blayout);
-         VData Datas = (VData)getApplication();
-        Datas.setInClikeoff(false);
-        Datas.setSetInOk(false);
-        Datas.setWaiteIn(false);
-        Datas.ReCode = "55";
-        vdata =Datas;
+        VData Dates = (VData)getApplication();
+        Dates.setInClikeoff(false);
+        Dates.setSetInOk(false);
+        Dates.setWaiteIn(false);
+        Dates.ReCode = "OK";
+        vdata =Dates;
         ChanngRemark_in = new String[vdata.inleng];
         ChanngeRemark_out = new String[vdata.outleng];
-        Createview(vdata.inleng,vdata.outleng);
-        CreateScene(vdata.Scenenum);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Createview(vdata.inleng,vdata.outleng);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            CreateScene(vdata.Scenenum);
+        }
 
         for (int i = 0 ; i<vdata.Scenenum ; i++){
             SceneRemark[i] = "null";
@@ -119,19 +120,6 @@ public class SetingActivtiy extends TabActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }
-        else
-        {
-           //  System.out.println("文件已经存在");
-         //    System.out.println("文件名："+config.getName());
-          //  System.out.println("文件绝对路径为："+config.getAbsolutePath());
-            //是存在工程目录下，所以
-         //    System.out.println("文件相对路径为："+config.getPath());
-         //    System.out.println("文件大小为："+config.length()+"字节");
-         //   System.out.println("文件是否可读："+config.canRead());
-          //   System.out.println("文件是否可写："+config.canWrite());
-            // System.out.println("我呢间是否隐藏："+file.isHidden());
-
         }
 
         config_in = new File(InFileNames);
@@ -160,6 +148,11 @@ public class SetingActivtiy extends TabActivity {
             }
         }
 
+        review = new Handler();
+        MyHandler handler = new MyHandler(this);
+        Internets = new MyUdpIo(handler,vdata.Thisip,Mrid1,Msid1);
+        new Thread(Internets).start();
+        vibrator = (Vibrator)this.getSystemService(VIBRATOR_SERVICE);
 
         SeekBar seekBar = (SeekBar) findViewById(R.id.progress);
         final TextView textView = (TextView) findViewById(R.id.text1);
@@ -203,7 +196,6 @@ public class SetingActivtiy extends TabActivity {
                 SendStatue();
             }
         });
-
 
         Spinner Savelist  = findViewById(R.id.SaveScene);
         Spinner Calllist = findViewById(R.id.CallScene);
@@ -310,70 +302,90 @@ public class SetingActivtiy extends TabActivity {
 
             }
         });
+
+
         // Init Scene remark
         new Thread(){
             @Override
             public void run() {
                 super.run();
-                ParseCode.parseSceneRemark(FileNames);
-                for (int i = 0 ; i<vdata.Scenenum ; i++){
-                    SceneButton button = findViewById(1000+i);
-                    if (!SceneRemark[i].equals("null")&&!SceneRemark[i].equals("")){
-                        button.Remark = SceneRemark[i];
+                synchronized (this) {
+                    ParseCode.parseSceneRemark(FileNames);
+                    for (int i = 0; i < vdata.Scenenum; i++) {
+                        SceneButton button = findViewById(1000 + i);
+                        if (!SceneRemark[i].equals("null") && !SceneRemark[i].equals("")) {
+                            button.Remark = SceneRemark[i];
+                        }
+
                     }
+                    try {
+                        wait(10);
+                        ParseCode.parseChanngeRemark(InFileNames, ChanngRemark_in);
+                        for (int i = 0; i < vdata.inleng; i++) {
+                            Mybutton button = findViewById(600 + i);
+                            if (!ChanngRemark_in[i].equals("null") && !ChanngRemark_in[i].equals("")) {
+                                button.Remark = ChanngRemark_in[i];
+                            }
+                        }
+
+                        wait(10);
+                        ParseCode.parseChanngeRemark(OutFileNames, ChanngeRemark_out);
+                        for (int i = 0; i < vdata.outleng; i++) {
+                            Mybutton button = findViewById(800 + i);
+                            if (!ChanngeRemark_out[i].equals("null") && !ChanngeRemark_out[i].equals("")) {
+                                button.Remark = ChanngeRemark_out[i];
+                            }
+
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+
+
+
 
                 }
             }
         }.start();
 
-        new Thread(){
+        new Thread( new Runnable(){
             @Override
             public void run() {
-                super.run();
-                ParseCode.parseChanngeRemark(InFileNames,ChanngRemark_in);
-                for (int i = 0 ; i<vdata.inleng ; i++){
-                    Mybutton button = findViewById(600+i);
-                    if (!ChanngRemark_in[i].equals("null")&&!ChanngRemark_in[i].equals("")){
-                        button.Remark = ChanngRemark_in[i];
+
+                synchronized (this) {
+                    try {
+
+                        wait(200);
+                      //  Log.d("Send get changge","sends");
+                        Refresh.GetChanngeStatue(vdata.outleng);
+                        wait(300);
+                        review.post(Refreshview);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
                     }
 
                 }
             }
-        }.start();
+        }).start();
 
-        new Thread(){
-            @Override
-            public void run() {
-                super.run();
-                ParseCode.parseChanngeRemark(OutFileNames,ChanngeRemark_out);
-                for (int i = 0 ; i<vdata.outleng ; i++){
-                    Mybutton button = findViewById(800+i);
-                    if (!ChanngeRemark_out[i].equals("null")&&!ChanngeRemark_out[i].equals("")){
-                        button.Remark = ChanngeRemark_out[i];
-                    }
 
-                }
-            }
-        }.start();
-
-        review = new Handler();
-        MyHandler handler = new MyHandler(this);
-       Internets = new MyUdpIo(handler,vdata.Thisip,Mrid1,Msid1);
-       new Thread(Internets).start();
-        vibrator = (Vibrator)this.getSystemService(this.VIBRATOR_SERVICE);
         new Thread(String.valueOf( Statue = new Handler() {
             @Override
             public void handleMessage(Message msg)  {
                 synchronized (this) {
                     if (msg.what == Mstatue) {
                         try {
-                            wait(700);
+                            wait(500);
+
                              if(vdata.ReCode.equals("null")){
                         Toast.makeText(getBaseContext(),"设备无响应",Toast.LENGTH_SHORT).show();
                             }else if(vdata.ReCode.equals("55")||vdata.ReCode.equals(vdata.vtype)) {
                                  vdata.ReCode ="null";
                                  Toast.makeText(getBaseContext(),"操作成功",Toast.LENGTH_SHORT).show();
 
+                             }else if (vdata.ReCode.equals("OK")){
+                                 Toast.makeText(getBaseContext(),"连接成功",Toast.LENGTH_SHORT).show();
                              }else {
                                 Toast.makeText(getBaseContext(),"执行错误："+vdata.ReCode,Toast.LENGTH_LONG).show();
                             }
@@ -392,55 +404,68 @@ public class SetingActivtiy extends TabActivity {
             }
         })).start();
 
-        final Activity my  =this;
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
+    }
 
-                synchronized (this){
+
+    Runnable Refreshview =new Runnable() {
+        //   @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+        @Override
+        public void run() {
+
+            int Num = Integer.parseInt(vdata.code[3],16)-2;
+          //  Log.d("code5",String.valueOf(vdata.code[5]));
+            if (Integer.parseInt(vdata.code[5],16)>vdata.outleng) {
+                Refresh.GetChanngeStatue(vdata.outleng);
+                synchronized (this) {
                     try {
-                        wait(200);
-                        Refresh.GetChanngeStatue(vdata.outleng,my);
-                        wait(200);
-                      //  Refresh.Refresh_view(my);
-                        review.post(Refreshview);
+                        wait(500);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
+                }
+            }
+            for (int i=0 ; i<Num ; i++) {
+                synchronized (this) {
+                    try {
+                        wait(5);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    //int Outbid = 0 ;
+                    Outbid = Integer.parseInt(vdata.code[i + 5], 16);
+                    i++;
+                    int InNum = Integer.parseInt(vdata.code[i + 5], 16) + 1;
+                    if (Outbid > vdata.outleng) {
+                        Log.d("OUtid:", String.valueOf(Outbid)+"："+String.valueOf(vdata.outleng)+String.valueOf(vdate.code[i+5]));
+                        break;
+                    }
+                    Mybutton out;
+                    out = (Mybutton) findViewById(800 + Outbid);
+                    out.setFoucse(true);
+                    out.setOutOK(true);
+                    vdata.setOutchannge(out.getMyId());
+                    vdata.setWaiteIn(false);
+                    out.setText(InNum + "->" + vdata.getOutchannge());
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                        out.setBackground(getResources().getDrawable(R.drawable.button_shap_on));
+                    }
+                    out.setTextColor(Color.parseColor("#22ee33"));
 
                 }
             }
-        }).start();
-
-    }
-
-    Runnable Refreshview =new Runnable() {
-        @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-        @Override
-        public void run() {
-            int Num = Integer.parseInt(vdata.code[3],16)-2;
-            for (int i=0 ; i<Num ; i++){
-                int Outid =Integer.parseInt(vdata.code[i+5]);
-                i++;
-                int InNum = Integer.parseInt(vdata.code[i+5],16)+1;
-                Mybutton out = (Mybutton)findViewById(800+Outid);
-                out.setFoucse(true);
-                out.setOutOK(true);
-                vdata.setOutchannge(out.getMyId());
-                vdata.setWaiteIn(false);
-                out.setText(InNum+"->"+vdata.getOutchannge());
-                out.setBackground(getResources().getDrawable(R.drawable.button_shap_on));
-                out.setTextColor(Color.parseColor("#22ee33"));
-            }
-
 
         }
     };
+
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         this.finish();
+        vdata.my_ethernet_address= "".toCharArray();
+        vdata.LoginOk =false ;
+        Outbid = 0 ;
+
     }
 
     public static class MyHandler extends Handler {
@@ -456,7 +481,7 @@ public class SetingActivtiy extends TabActivity {
                     case Mrid1:
                         // do something...
                     {
-                        //Log.d("set收到数据", msg.obj.toString());
+                    //    Log.d("set收到数据", msg.obj.toString());
                      //   Toast.makeText(,msg.obj.toString(),Toast.LENGTH_LONG);
                         String data = msg.obj.toString();
                         vdata.LoginOk = true;
@@ -539,7 +564,6 @@ public class SetingActivtiy extends TabActivity {
                                 //软键盘显示
                                 Keyboardon = true;
                                 //    Log.d("Up","keys");
-// changeKeyboardHeight(heightDifference);
                             } else if (screenHeight > 20 && heightDifference < 200) {
                                 //软键盘隐藏
 
@@ -581,7 +605,6 @@ public class SetingActivtiy extends TabActivity {
         for (int i = 0; i < outsum; i++) {
             final Mybutton is1 = new Mybutton(getBaseContext());
             is1.setText(i+1+"");
-           // @android.support.annotation.IdRes int ids = View.generateViewId();
             @android.support.annotation.IdRes int ids = 800+i;
             ((Mybutton) is1).SetButtonid(ids);
             is1.setId(ids);
@@ -636,7 +659,6 @@ public class SetingActivtiy extends TabActivity {
                                 //软键盘显示
                                 Keyboardon = true;
                                 //    Log.d("Up","keys");
-// changeKeyboardHeight(heightDifference);
                             } else if (screenHeight > 20 && heightDifference < 200) {
                                 //软键盘隐藏
 
@@ -1082,7 +1104,5 @@ public class SetingActivtiy extends TabActivity {
         Toast.makeText(getBaseContext(),"场景循环关闭...",Toast.LENGTH_SHORT).show();
         SendStatue();
     }
-
-
 
 }

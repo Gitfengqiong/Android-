@@ -29,16 +29,14 @@ public class Remark_Edit extends EditText {
         if (this.getText().length()>0 && !getText().equals("null")){
 
             scene.Remark = getText().toString();
-            scene.performClick();
-            scene.performClick();
+            scene.setText(scene.getText());
             SceneRemark[Buttonid-1000]=this.getText().toString();
             ParseCode.SaveSceneRemark(FileNames);
         }
 
         if (getText().equals("null")){
             scene.Remark = "";
-            scene.performClick();
-            scene.performClick();
+            scene.setText(scene.getText());
             SceneRemark[Buttonid-1000]="null";
             ParseCode.SaveSceneRemark(FileNames);
         }
@@ -49,16 +47,14 @@ public class Remark_Edit extends EditText {
         if (this.getText().length()>0 && !getText().equals("null")){
 
             scene.Remark = getText().toString();
-            scene.performClick();
-            scene.performClick();
+            scene.setText(scene.getText());
             SceneRemark[Buttonid-1000]=this.getText().toString();
             ParseCode.SaveSceneRemark(FileNames);
         }
 
         if (getText().equals("null")){
             scene.Remark = "";
-            scene.performClick();
-            scene.performClick();
+            scene.setText(scene.getText());
             SceneRemark[Buttonid-1000]="null";
             ParseCode.SaveSceneRemark(FileNames);
         }
@@ -70,16 +66,14 @@ public class Remark_Edit extends EditText {
         if (this.getText().length()>0 && !getText().equals("null")){
 
             scene.Remark = getText().toString();
-            scene.performClick();
-            scene.performClick();
+            scene.setText(scene.getText());
             ChanngRemark_in[Buttonid-IdBase]=this.getText().toString();
             ParseCode.SaveChanngeRemark(InFileNames,ChanngRemark_in,config_in,vdate.inleng);
         }
 
         if (getText().equals("null")){
             scene.Remark = "";
-            scene.performClick();
-            scene.performClick();
+            scene.setText(scene.getText());
             ChanngRemark_in[Buttonid-IdBase]="null";
             ParseCode.SaveChanngeRemark(InFileNames,ChanngRemark_in,config_in,vdate.inleng);
         }
@@ -90,16 +84,14 @@ public class Remark_Edit extends EditText {
         Mybutton scene = (Mybutton) getRootView().findViewById(Buttonid);
         if (this.getText().length()>0 && !getText().equals("null")){
             scene.Remark = getText().toString();
-            scene.performClick();
-            scene.performClick();
+            scene.setText(scene.getText());
             ChanngRemark_in[Buttonid-IdBase]=this.getText().toString();
             ParseCode.SaveChanngeRemark(InFileNames,ChanngRemark_in,config_in,vdate.inleng);
         }
 
         if (getText().equals("null")){
             scene.Remark = "";
-            scene.performClick();
-            scene.performClick();
+            scene.setText(scene.getText());
             ChanngRemark_in[Buttonid-IdBase]="null";
             ParseCode.SaveChanngeRemark(InFileNames,ChanngRemark_in,config_in,vdate.inleng);
         }
@@ -110,16 +102,14 @@ public class Remark_Edit extends EditText {
         if (this.getText().length()>0 && !getText().equals("null")){
 
             scene.Remark = getText().toString();
-            scene.performClick();
-            scene.performClick();
+            scene.setText(scene.getText());
             ChanngeRemark_out[Buttonid-IdBase]=this.getText().toString();
             ParseCode.SaveChanngeRemark(OutFileNames,ChanngeRemark_out,config_out,vdate.outleng);
         }
 
         if (getText().equals("null")){
             scene.Remark = "";
-            scene.performClick();
-            scene.performClick();
+            scene.setText(scene.getText());
             ChanngeRemark_out[Buttonid-IdBase]="null";
             ParseCode.SaveChanngeRemark(OutFileNames,ChanngeRemark_out,config_out,vdate.outleng);
         }
@@ -131,16 +121,14 @@ public class Remark_Edit extends EditText {
         if (this.getText().length()>0 && !getText().equals("null")){
 
             scene.Remark = getText().toString();
-            scene.performClick();
-            scene.performClick();
+            scene.setText(scene.getText());
             ChanngeRemark_out[Buttonid-IdBase]=this.getText().toString();
             ParseCode.SaveChanngeRemark(OutFileNames,ChanngeRemark_out,config_out,vdate.outleng);
         }
 
         if (getText().equals("null")){
             scene.Remark = "";
-            scene.performClick();
-            scene.performClick();
+            scene.setText(scene.getText());
             ChanngeRemark_out[Buttonid-IdBase]="null";
             ParseCode.SaveChanngeRemark(OutFileNames,ChanngeRemark_out,config_out,vdate.outleng);
         }
