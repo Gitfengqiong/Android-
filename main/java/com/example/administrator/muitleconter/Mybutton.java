@@ -322,9 +322,9 @@ public class Mybutton extends AppCompatButton {
             codes.append("05");
             codes.append(vdata.vtype);
             String hexchange = "";
-            if (MyId-1 < 16) {
+            if (MyId < 16) {
                 hexchange = "0" + Integer.toHexString(MyId);
-            }else if (MyId-1 >15) {
+            }else if (MyId >15) {
                 hexchange = Integer.toHexString(MyId);
             }
             codes.append(hexchange);

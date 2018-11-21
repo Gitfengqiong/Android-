@@ -481,7 +481,7 @@ public class SetingActivtiy extends TabActivity {
                     case Mrid1:
                         // do something...
                     {
-                    //    Log.d("set收到数据", msg.obj.toString());
+                     //  Log.d("set收到数据", msg.obj.toString());
                      //   Toast.makeText(,msg.obj.toString(),Toast.LENGTH_LONG);
                         String data = msg.obj.toString();
                         vdata.LoginOk = true;
@@ -516,8 +516,8 @@ public class SetingActivtiy extends TabActivity {
             layoutParams.setMargins(0, 0, 0, 0);
 
             GridLayout.LayoutParams param= new GridLayout.LayoutParams(spec(
-                    GridLayout.UNDEFINED,GridLayout.FILL,1f),
-                    spec(GridLayout.UNDEFINED,GridLayout.FILL,1f));
+                    GridLayout.UNDEFINED,1,1f),
+                    spec(GridLayout.UNDEFINED,1,1f));
             param.setMargins(3,3,3,3);
             is.setLayoutParams(layoutParams);
             buttonlayot.setLayoutParams(param);
@@ -616,8 +616,8 @@ public class SetingActivtiy extends TabActivity {
             layoutParams.setMargins(0, 0, 0, 0);
 
             GridLayout.LayoutParams param= new GridLayout.LayoutParams(spec(
-                    GridLayout.UNDEFINED,GridLayout.FILL,1f),
-                    spec(GridLayout.UNDEFINED,GridLayout.FILL,1f));
+                    GridLayout.UNDEFINED,1,1f),
+                    spec(GridLayout.UNDEFINED,1,1f));
             param.setMargins(3,3,3,3);
             buttonlayot.setLayoutParams(param);
             buttonlayot.setBackground(getResources().getDrawable(R.drawable.button_shap2));
