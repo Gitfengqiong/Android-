@@ -378,10 +378,11 @@ public class MainActivity extends Activity {
          //   int num =ParseCode.ParseMultiCodes(data);
           //  Log.d("find ip",iPlist[ipIndex-1].m_HostPort);
           //  CreateListView();
-          //  String s= "BA0103A001130F0F7D";
-         //   ParseCode.Parsecode(s);
-          //  vdate.LoginOk =true;
-          // runhandler.post(runui);
+            String s= "BA0103A001130F0F7D";
+           ParseCode.Parsecode(s);
+            vdate.LoginOk =true;
+             Toast.makeText(this,"演示模式",Toast.LENGTH_LONG).show();
+           runhandler.post(runui);
 
         }else if(ipin.getText().toString().length() <7){
             Toast toast = Toast.makeText(this,"地址错误",Toast.LENGTH_SHORT);

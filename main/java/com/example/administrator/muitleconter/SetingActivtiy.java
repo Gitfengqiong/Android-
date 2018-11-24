@@ -12,8 +12,12 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Vibrator;
+import android.support.annotation.IdRes;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -66,6 +70,8 @@ public class SetingActivtiy extends TabActivity {
     protected static String ChanngRemark_in[] ;
     protected static String ChanngeRemark_out[] ;
     protected   int Outbid = 0 ;
+    private SurfaceView Video[] =new SurfaceView[4];
+    private SurfaceHolder holder[] = new SurfaceHolder[4];
 
     @SuppressLint("HandlerLeak")
     @Override
@@ -77,6 +83,8 @@ public class SetingActivtiy extends TabActivity {
         gettab.addTab(sp);
         TabSpec sp1 = gettab.newTabSpec("tab2").setIndicator("场景设置").setContent(R.id.Tab2v);
         gettab.addTab(sp1);
+        TabSpec sp3 = gettab.newTabSpec("tab3").setIndicator("视频预监").setContent(R.id.Tab3v);
+        gettab.addTab(sp3);
         id = (GridLayout) findViewById(R.id.Tab1in);
         ido = (GridLayout) findViewById(R.id.Tab1out);
         Scenel = findViewById(R.id.Scenel);
@@ -404,6 +412,9 @@ public class SetingActivtiy extends TabActivity {
             }
         })).start();
 
+
+        initView(Video,holder);
+
     }
 
 
@@ -419,38 +430,42 @@ public class SetingActivtiy extends TabActivity {
                 synchronized (this) {
                     try {
                         wait(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-            for (int i=0 ; i<Num ; i++) {
-                synchronized (this) {
-                    try {
-                        wait(5);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    //int Outbid = 0 ;
-                    Outbid = Integer.parseInt(vdata.code[i + 5], 16);
-                    i++;
-                    int InNum = Integer.parseInt(vdata.code[i + 5], 16) + 1;
-                    if (Outbid > vdata.outleng) {
-                        Log.d("OUtid:", String.valueOf(Outbid)+"："+String.valueOf(vdata.outleng)+String.valueOf(vdate.code[i+5]));
-                        break;
-                    }
-                    Mybutton out;
-                    out = (Mybutton) findViewById(800 + Outbid);
-                    out.setFoucse(true);
-                    out.setOutOK(true);
-                    vdata.setOutchannge(out.getMyId());
-                    vdata.setWaiteIn(false);
-                    out.setText(InNum + "->" + vdata.getOutchannge());
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-                        out.setBackground(getResources().getDrawable(R.drawable.button_shap_on));
-                    }
-                    out.setTextColor(Color.parseColor("#22ee33"));
+                        if (!(Integer.parseInt(vdata.code[5],16)<0)) {
+                            for (int i = 0; i < Num; i++) {
+                                synchronized (this) {
+                                    try {
+                                        wait(5);
+                                    } catch (InterruptedException e) {
+                                        e.printStackTrace();
+                                    }
+                                    //int Outbid = 0 ;
+                                    Outbid = Integer.parseInt(vdata.code[i + 5], 16);
+                                    i++;
+                                    int InNum = Integer.parseInt(vdata.code[i + 5], 16) + 1;
+                                    if (Outbid > vdata.outleng) {
+                                        Log.d("OUtid:", String.valueOf(Outbid) + "：" + String.valueOf(vdata.outleng) + String.valueOf(vdate.code[i + 5]));
+                                        break;
+                                    }
+                                    Mybutton out;
+                                    out = (Mybutton) findViewById(800 + Outbid);
+                                    out.setFoucse(true);
+                                    out.setOutOK(true);
+                                    vdata.setOutchannge(out.getMyId());
+                                    vdata.setWaiteIn(false);
+                                    out.setText(InNum + "->" + vdata.getOutchannge());
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                        out.setBackground(getResources().getDrawable(R.drawable.button_shap_on));
+                                    }
+                                    out.setTextColor(Color.parseColor("#22ee33"));
 
+                                }
+                            }
+
+                        }
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+
+                    }
                 }
             }
 
@@ -499,14 +514,13 @@ public class SetingActivtiy extends TabActivity {
         }
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+
     public void Createview(int insum, int outsum ){
 
         for (int i = 0; i < insum; i++) {
             final   Mybutton is = new Mybutton(getBaseContext());
             is.setText(i+1+"");
-            @android.support.annotation.IdRes int ids =600+i ;
+            @IdRes int ids =600+i ;
             is.setId(ids);
             ((Mybutton) is).SetButtonid(ids);
             ((Mybutton) is).setMyId(i+1);
@@ -515,20 +529,27 @@ public class SetingActivtiy extends TabActivity {
             buttonlayot.setOrientation(LinearLayout.VERTICAL);
             layoutParams.setMargins(0, 0, 0, 0);
 
-            GridLayout.LayoutParams param= new GridLayout.LayoutParams(spec(
-                    GridLayout.UNDEFINED,1,1f),
-                    spec(GridLayout.UNDEFINED,1,1f));
+            GridLayout.LayoutParams param= null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                param = new GridLayout.LayoutParams(spec(
+                        GridLayout.UNDEFINED,1,1f),
+                        spec(GridLayout.UNDEFINED,1,1f));
+            }
             param.setMargins(3,3,3,3);
             is.setLayoutParams(layoutParams);
             buttonlayot.setLayoutParams(param);
-            buttonlayot.setBackground(getResources().getDrawable(R.drawable.button_shap2));
-            is.setHeight(150);
-            is.setTextSize(30);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                buttonlayot.setBackground(getResources().getDrawable(R.drawable.button_shap2));
+            }
+            is.setHeight(100);
+            is.setTextSize(20);
             is.setOnClickListener(new View.OnClickListener() {
                                       @Override
                                       public void onClick(View v) {
                                           vibrator.vibrate(70);
-                                          ((Mybutton) is).Clickstart(vdata);
+                                          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                              ((Mybutton) is).Clickstart(vdata);
+                                          }
                                       }
                                   }
             );
@@ -536,7 +557,9 @@ public class SetingActivtiy extends TabActivity {
                                           @Override
                                           public boolean onLongClick(View v) {
                                               vibrator.vibrate(70);
-                                              ((Mybutton) is).setOnLong(vdata );
+                                              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                                  ((Mybutton) is).setOnLong(vdata );
+                                              }
                                               return true;
                                           }
                                       }
@@ -546,9 +569,11 @@ public class SetingActivtiy extends TabActivity {
             final Remark_Edit ise = new Remark_Edit(getBaseContext());
             ise.Buttonid = ids ;
             ise.setHint("备注");
-            ise.setHeight(65);
+           // ise.setHeight(40);
             //ise.weight();
-            ise.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                ise.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            }
             ise.setTextColor(Color.parseColor("#33ee11"));
             buttonlayot.getViewTreeObserver().addOnGlobalLayoutListener(
                     new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -605,7 +630,7 @@ public class SetingActivtiy extends TabActivity {
         for (int i = 0; i < outsum; i++) {
             final Mybutton is1 = new Mybutton(getBaseContext());
             is1.setText(i+1+"");
-            @android.support.annotation.IdRes int ids = 800+i;
+            @IdRes int ids = 800+i;
             ((Mybutton) is1).SetButtonid(ids);
             is1.setId(ids);
             ((Mybutton) is1).setMyId(i+1);
@@ -615,21 +640,28 @@ public class SetingActivtiy extends TabActivity {
             buttonlayot.setOrientation(LinearLayout.VERTICAL);
             layoutParams.setMargins(0, 0, 0, 0);
 
-            GridLayout.LayoutParams param= new GridLayout.LayoutParams(spec(
-                    GridLayout.UNDEFINED,1,1f),
-                    spec(GridLayout.UNDEFINED,1,1f));
+            GridLayout.LayoutParams param= null;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                param = new GridLayout.LayoutParams(spec(
+                        GridLayout.UNDEFINED,1,1f),
+                        spec(GridLayout.UNDEFINED,1,1f));
+            }
             param.setMargins(3,3,3,3);
             buttonlayot.setLayoutParams(param);
-            buttonlayot.setBackground(getResources().getDrawable(R.drawable.button_shap2));
-            is1.setHeight(150);
-            is1.setTextSize(30);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                buttonlayot.setBackground(getResources().getDrawable(R.drawable.button_shap2));
+            }
+            is1.setHeight(100);
+            is1.setTextSize(20);
             is1.setLayoutParams(layoutParams);
 
             is1.setOnClickListener(new View.OnClickListener() {
                                        @Override
                                        public void onClick(View v) {
                                            vibrator.vibrate(70);
-                                           ((Mybutton) is1).Clickstart(vdata);
+                                           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+                                               ((Mybutton) is1).Clickstart(vdata);
+                                           }
                                            //SendCodes();
                                        }
                                    }
@@ -641,9 +673,11 @@ public class SetingActivtiy extends TabActivity {
 
             ise.Buttonid = ids ;
             ise.setHint("备注");
-            ise.setHeight(65);
+         //   ise.setHeight(40);
             //ise.weight();
-            ise.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+                ise.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
+            }
             ise.setTextColor(Color.parseColor("#33ee11"));
             buttonlayot.getViewTreeObserver().addOnGlobalLayoutListener(
                     new ViewTreeObserver.OnGlobalLayoutListener() {
@@ -718,7 +752,7 @@ public class SetingActivtiy extends TabActivity {
             is.setLayoutParams(layoutParams);
             buttonlayot.setLayoutParams(param);
             buttonlayot.setBackground(getResources().getDrawable(R.drawable.button_shap2));
-            is.setHeight(150);
+            is.setHeight(120);
             is.setTextSize(30);
 
            // is.setBackgroundColor(Color.parseColor("#ff1111"));
@@ -737,7 +771,7 @@ public class SetingActivtiy extends TabActivity {
 
             ise.Buttonid = ids ;
             ise.setHint("备注");
-            ise.setHeight(65);
+           // ise.setHeight(65);
             //ise.weight();
             ise.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
             ise.setTextColor(Color.parseColor("#33ee11"));
@@ -1103,6 +1137,24 @@ public class SetingActivtiy extends TabActivity {
         vdata.SceneStart=false;
         Toast.makeText(getBaseContext(),"场景循环关闭...",Toast.LENGTH_SHORT).show();
         SendStatue();
+    }
+
+    private void initView(SurfaceView v[] ,SurfaceHolder h[]){
+        v[0]=findViewById(R.id.v1);
+        h[0]=v[0].getHolder();
+        v[1]=findViewById(R.id.v2);
+        h[1]=v[1].getHolder();
+        v[2]=findViewById(R.id.v3);
+        h[2]=v[2].getHolder();
+        v[3]=findViewById(R.id.v4);
+        h[3]=v[3].getHolder();
+      //  h[0].addCallback((SurfaceHolder.Callback) SetingActivtiy.this );
+       // h[1].addCallback((SurfaceHolder.Callback) SetingActivtiy.this);
+      //  h[2].addCallback((SurfaceHolder.Callback) SetingActivtiy.this);
+      //  h[3].addCallback((SurfaceHolder.Callback) SetingActivtiy.this);
+        h[0].setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+       Startdecode s = new Startdecode(v,h,4);
+        s.Start();
     }
 
 }
