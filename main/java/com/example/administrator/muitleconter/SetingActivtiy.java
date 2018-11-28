@@ -1,10 +1,9 @@
 package com.example.administrator.muitleconter;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.TabActivity;
-import android.content.Context;
-import android.content.Intent;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Rect;
 import android.os.Build;
@@ -15,36 +14,50 @@ import android.os.Vibrator;
 import android.support.annotation.IdRes;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
+import android.view.GestureDetector;
+import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
+import android.widget.Switch;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 
+
+import com.xm.NetSdk;
+import com.xm.javaclass.H264_DVR_DEVICEINFO;
+import com.xm.video.MySurfaceView;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.security.acl.Group;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import static android.widget.GridLayout.spec;
+import static com.example.administrator.muitleconter.MainActivity.EnTestView;
 import static com.example.administrator.muitleconter.MainActivity.SceneRemark;
 import static com.example.administrator.muitleconter.MainActivity.config;
 import static com.example.administrator.muitleconter.MainActivity.config_in;
 import static com.example.administrator.muitleconter.MainActivity.config_out;
 import static com.example.administrator.muitleconter.MainActivity.vdate;
+import static com.example.administrator.muitleconter.Startdecode.netSdk;
 
 
 public class SetingActivtiy extends TabActivity {
@@ -70,20 +83,28 @@ public class SetingActivtiy extends TabActivity {
     protected static String ChanngRemark_in[] ;
     protected static String ChanngeRemark_out[] ;
     protected   int Outbid = 0 ;
-    private SurfaceView Video[] =new SurfaceView[4];
+    private MySurfaceView Video[] =new MySurfaceView[4];
     private SurfaceHolder holder[] = new SurfaceHolder[4];
-
+    private   boolean isFull =false ;
+    private MySurfaceView sdkView[] =new MySurfaceView[4];
+    protected static final int ViewNum = 4  ;
+    private GestureDetector gestureDetector ;
+    private int Inchangeid ;
+    private  Thread threadhalder ;
+    protected boolean EnClose = false ;
+    protected boolean bEnFull = true ;
     @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.seting);
+        EnClose = false ;
         TabHost gettab = getTabHost();
         TabSpec sp = gettab.newTabSpec("tab1").setIndicator("视频布局").setContent(R.id.Tab1v);
         gettab.addTab(sp);
         TabSpec sp1 = gettab.newTabSpec("tab2").setIndicator("场景设置").setContent(R.id.Tab2v);
         gettab.addTab(sp1);
-        TabSpec sp3 = gettab.newTabSpec("tab3").setIndicator("视频预监").setContent(R.id.Tab3v);
+        TabSpec sp3 = gettab.newTabSpec("tab3").setIndicator("视频预监").setContent(R.id.Tab3v3);
         gettab.addTab(sp3);
         id = (GridLayout) findViewById(R.id.Tab1in);
         ido = (GridLayout) findViewById(R.id.Tab1out);
@@ -156,6 +177,7 @@ public class SetingActivtiy extends TabActivity {
             }
         }
 
+        gestureDetector = new GestureDetector(this, new MyOnGestureListener());
         review = new Handler();
         MyHandler handler = new MyHandler(this);
         Internets = new MyUdpIo(handler,vdata.Thisip,Mrid1,Msid1);
@@ -364,10 +386,10 @@ public class SetingActivtiy extends TabActivity {
                 synchronized (this) {
                     try {
 
-                        wait(200);
+                        wait(100);
                       //  Log.d("Send get changge","sends");
                         Refresh.GetChanngeStatue(vdata.outleng);
-                        wait(300);
+                        wait(100);
                         review.post(Refreshview);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -412,8 +434,16 @@ public class SetingActivtiy extends TabActivity {
             }
         })).start();
 
-
-        initView(Video,holder);
+        if (EnTestView)
+        initView(Video,holder,ViewNum);
+         else
+        {
+            try {
+                sdkinitView(ViewNum);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
@@ -429,7 +459,7 @@ public class SetingActivtiy extends TabActivity {
                 Refresh.GetChanngeStatue(vdata.outleng);
                 synchronized (this) {
                     try {
-                        wait(500);
+                        wait(300);
                         if (!(Integer.parseInt(vdata.code[5],16)<0)) {
                             for (int i = 0; i < Num; i++) {
                                 synchronized (this) {
@@ -476,11 +506,18 @@ public class SetingActivtiy extends TabActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        this.finish();
         vdata.my_ethernet_address= "".toCharArray();
         vdata.LoginOk =false ;
+        if (!EnTestView) {
+            for (int i = 0; i < ViewNum; i++) {
+                netSdk.CloseAlarmChan(i);
+                netSdk.onDevLogout(i);
+            }
+            netSdk.Cleanup();
+        }
         Outbid = 0 ;
-
+        EnClose = true ;
+        this.finish();
     }
 
     public static class MyHandler extends Handler {
@@ -514,7 +551,160 @@ public class SetingActivtiy extends TabActivity {
         }
     }
 
+    class MyOnGestureListener extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onSingleTapUp(MotionEvent e) {
+               //         Log.i(getClass().getName(), "onSingleTapUp-----" + getActionName(e.getAction()));
 
+                       return false;
+                    }
+
+                @Override
+        public void onLongPress(MotionEvent e) {
+              //           Log.i(getClass().getName(), "onLongPress-----" + getActionName(e.getAction()));
+
+                    //TODO  输入通道预览
+
+                    vibrator.vibrate(100);
+                    bEnFull = false ;
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(SetingActivtiy.this);
+               //     dlg.setTitle("预览：");
+                    final View view = LayoutInflater.from(SetingActivtiy.this).inflate(R.layout.vwindow, null);
+                    final LinearLayout l = (LinearLayout) view.findViewById(R.id.vsss);
+                    SurfaceView s  =  findViewById(R.id.v1);
+                    final GridLayout g = (GridLayout)findViewById(R.id.Tab3v);
+                    g.removeView(s);
+                    LinearLayout.LayoutParams lp= new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    s.setLayoutParams(lp);
+                    l.addView(s);
+
+                    builder.setNegativeButton("退出", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            SurfaceView v1 = view.findViewById(R.id.v1);
+                            SurfaceView v2 = findViewById(R.id.v2);
+                            SurfaceView v3 = findViewById(R.id.v3);
+                            SurfaceView v4 = findViewById(R.id.v4);
+                            l.removeAllViews();
+                            g.removeView(v2);
+                            g.removeView(v3);
+                            g.removeView(v4);
+                            g.removeAllViews();
+                            for (int i = 0; i < 4; i++) {
+                                GridLayout.Spec rowSpec = GridLayout.spec((int)i / 2, 1f);
+                                GridLayout.Spec columnSpec = GridLayout.spec((int)i % 2, 1f);
+                                GridLayout.LayoutParams lp = new GridLayout.LayoutParams(rowSpec, columnSpec);
+                                lp.width = 0;
+                                lp.height = 0;
+                                switch (i){
+
+                                    case 0:
+                                        g.addView(v1, lp);
+                                        continue;
+                                    case  1:
+                                        g.addView(v2,lp);
+                                        continue;
+                                    case 2:
+                                        g.addView(v3,lp);
+                                        continue;
+                                    case 3:
+                                        g.addView(v4,lp);
+                                        continue;
+                                }
+
+                            }
+                              isFull = false ;
+                              bEnFull = true ;
+                            dialog.dismiss();
+
+                        }
+                    });
+                    final AlertDialog dlg = builder.create();
+                    dlg.setCancelable(false);
+                    dlg.setView(view,0,0,0,0);
+                    dlg.show();
+                    WindowManager.LayoutParams layoutParams = dlg.getWindow().getAttributes();
+                    layoutParams.width = 576;
+                    layoutParams.height = 480;
+                    dlg.getWindow().setAttributes(layoutParams);
+
+                    }
+
+                 @Override
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                  //   Log.i(getClass().getName(),
+                  //                    "onScroll-----" + getActionName(e2.getAction()) + ",(" + e1.getX() + "," + e1.getY() + ") ,("
+                  //                            + e2.getX() + "," + e2.getY() + ")");
+                        return false;
+                     }
+
+                 @Override
+        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                   //   Log.i(getClass().getName(),
+                   //                     "onFling-----" + getActionName(e2.getAction()) + ",(" + e1.getX() + "," + e1.getY() + ") ,("
+                    //                           + e2.getX() + "," + e2.getY() + ")");
+                      return false;
+                   }
+
+               @Override
+        public void onShowPress(MotionEvent e) {
+                     //   Log.i(getClass().getName(), "onShowPress-----" + getActionName(e.getAction()));
+                    }
+
+               @Override
+        public boolean onDown(MotionEvent e) {
+                    // Log.i(getClass().getName(), "onDown-----" + getActionName(e.getAction()));
+                        return false;
+                   }
+
+                 @Override
+         public boolean onDoubleTap(MotionEvent e) {
+                  //     Log.i(getClass().getName(), "onDoubleTap-----" + getActionName(e.getAction()));
+                     vibrator.vibrate(100);
+                     Mybutton b = findViewById(Inchangeid);
+                     b.setOnLong(vdata);
+                         return false;
+                     }
+
+                 @Override
+                 public boolean onDoubleTapEvent(MotionEvent e) {
+                   //     Log.i(getClass().getName(), "onDoubleTapEvent-----" + getActionName(e.getAction()));
+                       return false;
+                   }
+
+                 @Override
+        public boolean onSingleTapConfirmed(MotionEvent e) {
+                    //    Log.i(getClass().getName(), "onSingleTapConfirmed-----" + getActionName(e.getAction()));
+                        vibrator.vibrate(70);
+                        Mybutton b = findViewById(Inchangeid);
+                        b.Clickstart(vdata);
+                        return false;
+                    }
+     }
+
+    private String getActionName(int action) {
+                 String name = "";
+                 switch (action) {
+                         case MotionEvent.ACTION_DOWN: {
+                                 name = "ACTION_DOWN";
+                                 break;
+                             }
+                         case MotionEvent.ACTION_MOVE: {
+                                 name = "ACTION_MOVE";
+                                 break;
+                             }
+                         case MotionEvent.ACTION_UP: {
+                                 name = "ACTION_UP";
+                                 break;
+                             }
+                         default:
+                             break;
+                     }
+                 return name;
+             }
+
+
+    @SuppressLint("ClickableViewAccessibility")
     public void Createview(int insum, int outsum ){
 
         for (int i = 0; i < insum; i++) {
@@ -543,6 +733,7 @@ public class SetingActivtiy extends TabActivity {
             }
             is.setHeight(100);
             is.setTextSize(20);
+            /*
             is.setOnClickListener(new View.OnClickListener() {
                                       @Override
                                       public void onClick(View v) {
@@ -553,6 +744,7 @@ public class SetingActivtiy extends TabActivity {
                                       }
                                   }
             );
+
             is.setOnLongClickListener(new View.OnLongClickListener() {
                                           @Override
                                           public boolean onLongClick(View v) {
@@ -564,6 +756,17 @@ public class SetingActivtiy extends TabActivity {
                                           }
                                       }
             );
+
+*/
+            is.setOnTouchListener(new View.OnTouchListener() {
+                @Override
+                public boolean onTouch(View v, MotionEvent event) {
+                    Inchangeid =  v.getId();
+                    gestureDetector.onTouchEvent(event);
+                    return true ;
+                }
+            });
+
 
             buttonlayot.addView(is);
             final Remark_Edit ise = new Remark_Edit(getBaseContext());
@@ -1139,7 +1342,8 @@ public class SetingActivtiy extends TabActivity {
         SendStatue();
     }
 
-    private void initView(SurfaceView v[] ,SurfaceHolder h[]){
+    private void initView(final MySurfaceView v[] , final SurfaceHolder h[] , final int chn){
+
         v[0]=findViewById(R.id.v1);
         h[0]=v[0].getHolder();
         v[1]=findViewById(R.id.v2);
@@ -1148,13 +1352,84 @@ public class SetingActivtiy extends TabActivity {
         h[2]=v[2].getHolder();
         v[3]=findViewById(R.id.v4);
         h[3]=v[3].getHolder();
-      //  h[0].addCallback((SurfaceHolder.Callback) SetingActivtiy.this );
-       // h[1].addCallback((SurfaceHolder.Callback) SetingActivtiy.this);
-      //  h[2].addCallback((SurfaceHolder.Callback) SetingActivtiy.this);
-      //  h[3].addCallback((SurfaceHolder.Callback) SetingActivtiy.this);
         h[0].setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
-       Startdecode s = new Startdecode(v,h,4);
-        s.Start();
+        new Thread(){
+            @Override
+            public void run() {
+                super.run();
+                Startdecode s = new Startdecode(v,h,chn);
+                s.Start_test();
+            }
+        }.start();
+
     }
 
+
+
+    private void  sdkinitView(final int chn) throws InterruptedException {
+
+      //  mWndsHolder.vv1.initAdd(new int[] { R.drawable.wnd_normal, R.drawable.wnd_selected });
+      //  mWndsHolder.vv2.initAdd(new int[] { R.drawable.w, R.drawable.wnd_add_selected });
+       // mWndsHolder.vv3.initAdd(new int[] { R.drawable.wnd_add_normal, R.drawable.wnd_add_selected });
+      //  mWndsHolder.vv4.initAdd(new int[] { R.drawable.wnd_add_normal, R.drawable.wnd_add_selected });
+        final Startdecode s = new Startdecode(chn);
+        s.mWndsHolder = new Startdecode.WndsHolder();
+        s.mWndsHolder.vv1 =findViewById(R.id.v1);
+        s.mWndsHolder.vv2 =findViewById(R.id.v2);
+        s.mWndsHolder.vv3 =findViewById(R.id.v3);
+        s.mWndsHolder.vv4 =findViewById(R.id.v4);
+    //    s.mWndsHolder.vv5 =findViewById(R.id.v4);
+        s.mWndsHolder.vv1.init(this, 0);
+        s.mWndsHolder.vv2.init(this, 1);
+        s.mWndsHolder.vv3.init(this, 2);
+        s.mWndsHolder.vv4.init(this, 3);
+      //  s.mWndsHolder.vv5.init(this,3);
+        /*
+        final Startdecode s1 =new Startdecode(1);
+        s1.mWndsHolder = new Startdecode.WndsHolder();
+        s1.mWndsHolder.vv1 =findViewById(R.id.vsu);
+        s1.mWndsHolder.vv1.init(this, 0);
+     */
+      threadhalder =  new Thread(){
+           @Override
+           public void run() {
+               super.run();
+               if (EnClose)
+                   return;
+               synchronized (this){
+                   try {
+                       wait(300);
+                       s.Start_sdk();
+                     //  wait(300);
+                     //  s1.Start_sdk();
+                   } catch (InterruptedException e) {
+                       e.printStackTrace();
+                   }
+
+               }
+
+           }
+       };
+       threadhalder.start();
+
+    }
+
+    public void FullView(View view) {
+        if (bEnFull) {
+            SurfaceView v = (SurfaceView) view;
+            GridLayout.LayoutParams l = (GridLayout.LayoutParams) v.getLayoutParams();
+            if (!isFull) {
+                l.height = GridLayout.LayoutParams.MATCH_PARENT;
+                l.width = GridLayout.LayoutParams.MATCH_PARENT;
+                v.setLayoutParams(l);
+                isFull = true;
+            } else {
+                l.height = 0;
+                l.width = 0;
+                v.setLayoutParams(l);
+                isFull = false;
+            }
+
+        }
+    }
 }

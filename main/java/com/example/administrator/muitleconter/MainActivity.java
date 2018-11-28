@@ -50,11 +50,11 @@ public class MainActivity extends Activity {
     protected static File config_in ;
     protected static File config_out ;
     protected static String SceneRemark[] ;
-
     private static boolean  NewD = false;
     //private static String debugs;
    // private static EditText e;
   //  protected static MyUdpIo  Internets;
+    protected static boolean EnTestView =false ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,7 +91,7 @@ public class MainActivity extends Activity {
             @Override
             public void onItemClick(AdapterView<?> arg0, View arg1, final int arg2,
                                     long arg3) {
-               // vdata.LoginOk =false ;
+               EnTestView =false ;
                 //获得选中项的HashMap对象
                 HashMap<String,String> map=(HashMap<String,String>)listView.getItemAtPosition(arg2);
                 IP=map.get("itemip");
@@ -379,15 +379,17 @@ public class MainActivity extends Activity {
           //  Log.d("find ip",iPlist[ipIndex-1].m_HostPort);
           //  CreateListView();
             String s= "BA0103A001130F0F7D";
-           ParseCode.Parsecode(s);
+            ParseCode.Parsecode(s);
             vdate.LoginOk =true;
              Toast.makeText(this,"演示模式",Toast.LENGTH_LONG).show();
+             EnTestView = true ;
            runhandler.post(runui);
 
         }else if(ipin.getText().toString().length() <7){
             Toast toast = Toast.makeText(this,"地址错误",Toast.LENGTH_SHORT);
             toast.show();
         }else {
+            EnTestView =false ;
                 try {
                         Internet.setIp(ipin.getText().toString());
                         Internet.setMreid(Mrid);
