@@ -37,31 +37,32 @@
                 android:text="搜索设备"
                 android:textColor="@android:color/holo_orange_dark"
                 />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="3.67">
-            <ListView
-                android:id="@+id/list_view"
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="5"
-                android:listSelector="@drawable/button_shap_on"
-                android:background="@drawable/button_shap_all_on">
 
-            </ListView>
+                <ListView
+                    android:id="@+id/list_view"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="5"
+                    android:background="@drawable/button_shap_all_on"
+                    android:listSelector="@drawable/button_shap_on">
+
+                </ListView>
 
 
-            <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginLeft="10sp"
-                android:background="@drawable/button_shap1"
-                android:layout_gravity="center_vertical|center_horizontal"
-                android:onClick="search"
-                android:text="搜索&#10;Search"
-                />
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|center_horizontal"
+                    android:layout_marginLeft="10sp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_shap1"
+                    android:onClick="search"
+                    android:text="搜索&#10;Search" />
             </LinearLayout>
 
         </LinearLayout>
@@ -93,30 +94,38 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="3.67"
                 android:layout_gravity="top"
+                android:layout_weight="3.67"
                 android:gravity="center_vertical">
 
-            <EditText
-                android:id="@+id/inip"
-                android:layout_width="0dp"
-                android:layout_height="60dp"
-                android:layout_weight="5"
-                android:background="@drawable/spinner_item"
-                android:hint="请输入设备IP"
-                android:inputType="number"
-                android:padding="10dp"
-                />
+                <EditText
+                    android:id="@+id/inip"
+                    android:layout_width="0dp"
+                    android:layout_height="60dp"
+                    android:layout_weight="5"
+                    android:background="@drawable/spinner_item"
+                    android:hint="请输入设备IP"
+                    android:inputType="number"
+                    android:padding="10dp" />
 
-            <Button
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="10sp"
-                android:onClick="Links"
-                android:background="@drawable/button_shap1"
-                android:text="确认&#10;OK" />
-        </LinearLayout>
+                <Button
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_shap1"
+                    android:onClick="Links"
+                    android:text="确认&#10;OK" />
+
+                <Button
+                    android:id="@+id/findec"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10sp"
+                    android:layout_weight="1"
+                    android:background="@drawable/button_shap1"
+                    android:text="预监&#10;Find" />
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>

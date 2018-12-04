@@ -363,6 +363,7 @@ public class Mybutton extends AppCompatButton {
             this.setText(this.getMyId()+"");
            // this.setBackgroundColor(Color.parseColor("#ff1111"));
             this.setBackground(this.getResources().getDrawable(R.drawable.button_shap2));
+            /*
             for (int i=0 ; i <vdata.outleng ;i++)
             {
                 Mybutton out = (Mybutton) getRootView().findViewById(800+i);
@@ -375,6 +376,7 @@ public class Mybutton extends AppCompatButton {
                 out.setTextColor(Color.parseColor("#ee2233"));
                 out.setOutOK(false);
             }
+            */
             if (Foucse){
                 this.setTextColor(Color.parseColor("#22ee33"));
             }

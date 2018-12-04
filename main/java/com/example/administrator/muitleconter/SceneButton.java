@@ -24,7 +24,7 @@ public class SceneButton extends AppCompatButton {
     }
     public boolean Onstatu =false ;
     public int id ;
-    private boolean Foucse =false;
+    public boolean Foucse =false;
     public  String Remark = "";
     @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     public int Clickstart(VData vdata ){
@@ -122,7 +122,7 @@ public class SceneButton extends AppCompatButton {
         Statue.sendMessage(msg);
     }
 
-    private void SendRefresh(){
+    protected static void SendRefresh(){
         Message msg = new Message();
         msg.what = MReview;
         Statue.sendMessage(msg);

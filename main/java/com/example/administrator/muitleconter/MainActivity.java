@@ -10,18 +10,33 @@ package com.example.administrator.muitleconter;
         import android.app.AlertDialog;
         import android.os.Bundle;
         import android.text.method.DigitsKeyListener;
+        import android.util.DisplayMetrics;
         import android.util.Log;
         import android.view.LayoutInflater;
         import android.view.View;
         import android.widget.AdapterView;
+        import android.widget.Button;
         import android.widget.EditText;
         import android.widget.ListView;
         import android.widget.SimpleAdapter;
         import android.widget.Spinner;
         import android.widget.Toast;
 
+        import com.xm.DevInfo;
+        import com.xm.GlobalData;
+        import com.xm.MyConfig;
+        import com.xm.NetSdk;
+        import com.xm.SearchDeviceInfo;
+        import com.xm.dialog.RadarSearchDevicesDlg;
+        import com.xm.net.NetConfig;
+        import com.xm.utils.MyWifiManager;
+        import com.xm.dialog.RadarSearchDevicesDlg.OnMySearchListener;
+        import com.xm.dialog.RadarSearchDevicesDlg.onMyCancelListener;
+        import com.xm.dialog.RadarSearchDevicesDlg.onMyDismissListener;
+        import com.xm.dialog.RadarSearchDevicesDlg.onMySelectDevListener;
+
         import java.io.File;
-        import java.io.IOException;
+        import java.io.UnsupportedEncodingException;
         import java.lang.ref.WeakReference;
         import java.util.ArrayList;
         import java.util.HashMap;
@@ -55,10 +70,140 @@ public class MainActivity extends Activity {
    // private static EditText e;
   //  protected static MyUdpIo  Internets;
     protected static boolean EnTestView =false ;
+    private int mWndSelected = 0; // 选中的窗口
+    protected   NetSdk mNetSdk;
+    private MyWifiManager  mWifiManager;
+    private int mSocketStyle = MyConfig.SocketStyle.TCPSOCKET;
+    protected   SearchDeviceInfo[] encoders = new  SearchDeviceInfo[20];
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.longin);
+        for (int i=0 ;i<20 ;i++) {
+            encoders[i] = new SearchDeviceInfo();
+            //创建30个IP参数单
+        }
+        encoders[0].HostIP = "NUll";
+        Button findec = findViewById(R.id.findec);
+        findec.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                NetSdk  netSdk = new NetSdk();
+                netSdk.DevInit();
+                mNetSdk = netSdk.getInstance();
+                mNetSdk.onStopAlarmMsg(false);
+                mNetSdk.setOnAlarmListener(new NetSdk.OnAlarmListener() {
+                    @Override
+                    public void onAlarm(long loginid, int ichannel, int iEvent, int iStatus, int[] time) {
+                        Log.d( "iEvent:", String.valueOf(iEvent));
+                    }
+                });
+             //   getd();
+                synchronized (this) {
+                    int i = mNetSdk.SearchDevice(encoders, 20, 2000, true);
+                    try {
+                        wait(5000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    Log.d("DEv:", String.valueOf(i));
+                }
+
+                Log.d("devt:",encoders[0].HostIP);
+
+                mWifiManager =    MyWifiManager.getInstance(MainActivity.this);
+                // RadarSearchDevicesDlg 图片资源前三个雷达相关，后两个检索到的设备图标
+                int[] res = { R.mipmap.gplus_search_bg, R.mipmap.locus_round_click, R.mipmap.gplus_search_args,
+                        R.mipmap.chn_green, R.mipmap.chn_red ,R.mipmap.chn_green};
+                // RadarSearchDevicesDlg 文本资源
+                int[] textres = { R.string.find, R.string.find_dev, R.string.password_error3 };
+                // 获取当前手机的屏幕高、宽
+                DisplayMetrics dm = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(dm);
+                float mDensity = dm.density;
+                // mDensity与文字大小相关
+                final RadarSearchDevicesDlg  dlg = new RadarSearchDevicesDlg(MainActivity.this, res, textres, mDensity,mWifiManager);
+                // RadarSearchDevicesDlg wifi名称框背景
+                dlg.setTextViewBackgroundResource(R.drawable.textfield_bg);
+                // RadarSearchDevicesDlg 密码框背景
+                dlg.setEditTextBackgroundResource(R.drawable.textfield_bg);
+                // RadarSearchDevicesDlg wifi左边图标
+                dlg.setWifiImageResource(R.mipmap.wifi_logo);
+                // RadarSearchDevicesDlg 密码左边图标
+                dlg.setPasswordImageResource(R.mipmap.password_logo);
+                // RadarSearchDevicesDlg 消失监听
+                dlg.setOnDismissListener(new onMyDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface arg0) {
+
+                    }
+                });
+                // RadarSearchDevicesDlg 取消监听
+                dlg.setOnMyCancelListener(new onMyCancelListener() {
+
+                    @Override
+                    public void onCancel(int arg0) {
+                    }
+                });
+                // RadarSearchDevicesDlg 搜索到设备，雷达中会显示设备图标，这是点击图标监听
+
+                dlg.setOnMySelectDevListener(new onMySelectDevListener() {
+                    @Override
+                    public void onSelectDev(DevInfo devinfo) {
+                        // DevInfo 设备信息类
+                        final DevInfo _devInfo = devinfo;
+                        _devInfo.Socketstyle = MyConfig.SocketStyle.TCPSOCKET;
+                        try {
+                            _devInfo.UserName = "admin".getBytes("GBK");
+                        } catch (UnsupportedEncodingException e) {
+
+                            e.printStackTrace();
+                        }
+                        _devInfo.PassWord = "";
+                        _devInfo.wifi_ssid = mWifiManager.getSSID();
+                        onClearData();
+                        Log.d("this",_devInfo.Ip);
+                        // 登录设备 @param 窗口号 设备信息类 Socket类别
+                        int[] mLoginError = new int[1]; // 登陆错误值
+                        GlobalData.mLoginId = mNetSdk.onLoginDevNat(mWndSelected, _devInfo, mLoginError, mSocketStyle);
+                        dlg.onDismiss();
+                    }
+                });
+                dlg.setOnMySearchListener(new OnMySearchListener() {
+
+                    @Override
+                    public void onMySearch(String ssid, String password) {
+
+                        Log.d("ssid:",password);
+
+                    }
+                });
+                // RadarSearchDevicesDlg 标题
+                dlg.setTitle(R.string.add_dev);
+                // RadarSearchDevicesDlg “显示密码” 文字设置
+                dlg.setShowPwdText(R.string.show_pwd);
+                // 搜索按钮 样式资源
+                int[] srcs = { R.drawable.bg_color6, R.drawable.button6_sel };
+                // wifi信息
+                NetConfig netConfig = new NetConfig();
+                mNetSdk.GetLocalWifiNetConfig(netConfig, mWifiManager.getDhcpInfo());
+                netConfig.mac = mWifiManager.getMacAddress();
+                netConfig.linkSpeed = mWifiManager.getLinkSpeed();
+                // 设置 搜索按钮背景
+                dlg.setButtonBackgroundResource(srcs);
+                dlg.setButtonText("搜索");
+                dlg.setWifiNetConfig(netConfig);
+                String password = "";
+                // 初始化 mWifiManager.getSSID() 当前wifi名称， password 默认密码
+                dlg.setText(mWifiManager.getSSID(), password);
+                // 设置RadarSearchDevicesDlg中wifi信息为当前wifi的信息 ScanResult
+                dlg.setWifiResult(mWifiManager.getCurScanResult(mWifiManager.getSSID()));
+                dlg.onShow();
+
+
+            }
+        });
         //Cheek InterNet
        if(!CheekInternet.isNetworkAvalible(this))
            CheekInternet.checkNetwork(this);
@@ -324,6 +469,8 @@ public class MainActivity extends Activity {
 
         });
 
+
+
     }
     Runnable runui =new Runnable() {
             @Override
@@ -559,6 +706,121 @@ public class MainActivity extends Activity {
         }
     }
 
+    /*
 
+    protected void Finds(View view){
+
+        NetSdk  netSdk = new NetSdk();
+        netSdk.DevInit();
+        mNetSdk = netSdk.getInstance();
+        mNetSdk.onStopAlarmMsg(false);
+        mNetSdk.setOnAlarmListener(new NetSdk.OnAlarmListener() {
+
+            @Override
+            public void onAlarm(long loginid, int ichannel, int iEvent, int iStatus, int[] time) {
+                Log.d( "iEvent:", String.valueOf(iEvent));
+            }
+        });
+        mWifiManager =  new MyWifiManager(view.getContext());
+        // RadarSearchDevicesDlg 图片资源前三个雷达相关，后两个检索到的设备图标
+        int[] res = { R.mipmap.gplus_search_bg, R.mipmap.locus_round_click, R.mipmap.gplus_search_args,
+                R.mipmap.chn_green, R.mipmap.chn_red };
+        // RadarSearchDevicesDlg 文本资源
+        int[] textres = { R.string.find, R.string.find_dev, R.string.password_error3 };
+        // 获取当前手机的屏幕高、宽
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        float mDensity = dm.density;
+        // mDensity与文字大小相关
+        RadarSearchDevicesDlg  dlg = new RadarSearchDevicesDlg(MainActivity.this, res, textres, mDensity, null);
+        // RadarSearchDevicesDlg wifi名称框背景
+        dlg.setTextViewBackgroundResource(R.drawable.textfield_bg);
+        // RadarSearchDevicesDlg 密码框背景
+        dlg.setEditTextBackgroundResource(R.drawable.textfield_bg);
+        // RadarSearchDevicesDlg wifi左边图标
+        dlg.setWifiImageResource(R.mipmap.wifi_logo);
+        // RadarSearchDevicesDlg 密码左边图标
+        dlg.setPasswordImageResource(R.mipmap.password_logo);
+        // RadarSearchDevicesDlg 消失监听
+        dlg.setOnDismissListener(new RadarSearchDevicesDlg.onMyDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface arg0) {
+
+            }
+        });
+        // RadarSearchDevicesDlg 取消监听
+        dlg.setOnMyCancelListener(new RadarSearchDevicesDlg.onMyCancelListener() {
+
+            @Override
+            public void onCancel(int arg0) {
+            }
+        });
+        // RadarSearchDevicesDlg 搜索到设备，雷达中会显示设备图标，这是点击图标监听
+
+        dlg.setOnMySelectDevListener(new RadarSearchDevicesDlg.onMySelectDevListener() {
+            @Override
+            public void onSelectDev(DevInfo devinfo) {
+                // DevInfo 设备信息类
+                final DevInfo _devInfo = devinfo;
+                _devInfo.Socketstyle = MyConfig.SocketStyle.TCPSOCKET;
+                try {
+                    _devInfo.UserName = "admin".getBytes("GBK");
+                } catch (UnsupportedEncodingException e) {
+
+                    e.printStackTrace();
+                }
+                _devInfo.PassWord = "";
+                _devInfo.wifi_ssid = mWifiManager.getSSID();
+                onClearData();
+                // 登录设备 @param 窗口号 设备信息类 Socket类别
+                int[] mLoginError = new int[1]; // 登陆错误值
+                GlobalData.mLoginId = mNetSdk.onLoginDevNat(mWndSelected, _devInfo, mLoginError, mSocketStyle);
+
+            }
+        });
+        dlg.setOnMySearchListener(new RadarSearchDevicesDlg.OnMySearchListener() {
+
+            @Override
+            public void onMySearch(String ssid, String password) {
+
+            }
+        });
+        // RadarSearchDevicesDlg 标题
+        dlg.setTitle(R.string.add_dev);
+        // RadarSearchDevicesDlg “显示密码” 文字设置
+        dlg.setShowPwdText(R.string.show_pwd);
+        // 搜索按钮 样式资源
+        int[] srcs = { R.drawable.bg_color6, R.drawable.button6_sel };
+        // wifi信息
+        NetConfig netConfig = new NetConfig();
+        mNetSdk.GetLocalWifiNetConfig(netConfig, mWifiManager.getDhcpInfo());
+        netConfig.mac = mWifiManager.getMacAddress();
+        netConfig.linkSpeed = mWifiManager.getLinkSpeed();
+        // 设置 搜索按钮背景
+        dlg.setButtonBackgroundResource(srcs);
+        dlg.setButtonText("搜索");
+        dlg.setWifiNetConfig(netConfig);
+        String password = "";
+        // 初始化 mWifiManager.getSSID() 当前wifi名称， password 默认密码
+        dlg.setText(mWifiManager.getSSID(), password);
+        // 设置RadarSearchDevicesDlg中wifi信息为当前wifi的信息 ScanResult
+        dlg.setWifiResult(mWifiManager.getCurScanResult(mWifiManager.getSSID()));
+        dlg.onShow();
+    }
+
+
+
+
+
+
+*/
+    private void onClearData() {
+        //  onStopChn(4);
+        mNetSdk.setReceiveCompleteVData(0, false);
+        if (GlobalData.mLoginId != 0) {
+            mNetSdk.onDevLogout(GlobalData.mLoginId);
+            GlobalData.mLoginId = 0;
+        }
+    }
 }
 

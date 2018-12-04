@@ -40,4 +40,9 @@
         <item>115200</item>
     </string-array>
 
+    <string name="find">Find</string>
+    <string name="find_dev">device, select a add in radar range</string>
+    <string name="password_error3">Password error</string>
+    <string name="add_dev">Add device</string>
+    <string name="show_pwd">Show password</string>
 </resources>

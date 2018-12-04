@@ -88,7 +88,7 @@ public class Startdecode {
     }
 
 
-    public  boolean Start_sdk(){
+    public  boolean Start_sdk(String StartIP){
         ReviewState = new int[] { 0, 0, 0, 0 };
         Channel = new int[] { -1, -1, -1, -1 };
         netSdk = new NetSdk();
@@ -109,7 +109,7 @@ public class Startdecode {
             final int finalI = i;
 
                             mWndSelected = finalI;
-                            onLogin("192.168.2.10", "34567", "admin", "" ,mWndSelected);
+                            onLogin(StartIP, "34567", "admin", "" ,mWndSelected);
                             onPlay(mWndSelected);
 
 

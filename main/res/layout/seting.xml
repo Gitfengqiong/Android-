@@ -128,7 +128,6 @@
                             android:layout_height="match_parent"
                             android:text="保存场景"
                             android:textColor="@color/colorlvBtn"
-                            android:textSize="30sp"
                             android:layout_gravity="center_vertical|center_horizontal"
                             android:gravity="center_vertical|center_horizontal"
                             android:textAlignment="center"/>
@@ -147,7 +146,6 @@
                             android:layout_height="match_parent"
                             android:text="场景循环"
                             android:textColor="@color/colorlvBtn"
-                            android:textSize="30sp"
                             android:layout_gravity="center_vertical|center_horizontal"
                             android:gravity="center_vertical|center_horizontal"
                             android:textAlignment="center"/>
@@ -177,7 +175,6 @@
                             android:text=" Call Scene"
                             android:gravity="center_vertical|center_horizontal"
                             android:textColor="@color/colorlvBtn"
-                            android:textSize="30sp"
                             android:background="@drawable/button_shap_all_on"/>
                     <ScrollView
                         android:id="@+id/w"
@@ -239,7 +236,7 @@
                             android:textAlignment="center"
                             android:textColor="#11ee11"
                             android:background="@drawable/button_shap_on"
-                            android:padding="20sp"/>
+                            />
 
                         <Button
                             android:layout_width="0dp"
@@ -250,7 +247,7 @@
                             android:textAlignment="center"
                             android:textColor="#ee1111"
                             android:background="@drawable/button_shap2"
-                            android:padding="20sp"/>
+                           />
                         <SeekBar
                             android:id="@+id/progress"
                             android:layout_width="0dp"
@@ -277,7 +274,6 @@
                             android:padding="6dp"
                             android:text="Timer:UDF"
                             android:textColor="#16BC5C"
-                            android:textSize="30sp"
                             android:textAlignment="center"
                             android:layout_gravity="center_horizontal"/>
                     </LinearLayout>

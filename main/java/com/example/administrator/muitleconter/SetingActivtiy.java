@@ -57,6 +57,7 @@ import static com.example.administrator.muitleconter.MainActivity.config;
 import static com.example.administrator.muitleconter.MainActivity.config_in;
 import static com.example.administrator.muitleconter.MainActivity.config_out;
 import static com.example.administrator.muitleconter.MainActivity.vdate;
+import static com.example.administrator.muitleconter.SceneButton.SendRefresh;
 import static com.example.administrator.muitleconter.Startdecode.netSdk;
 
 
@@ -93,6 +94,11 @@ public class SetingActivtiy extends TabActivity {
     private  Thread threadhalder ;
     protected boolean EnClose = false ;
     protected boolean bEnFull = true ;
+    private  Handler handler_Scene_loop;
+    private int timeout = 3 ;
+    private final static int SCENE_BASE = 1000 ;
+    private final static int INCHANNGE_BASE = 600 ;
+    private int Scene_Loop_Index = 0 ;
     @SuppressLint("HandlerLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -110,6 +116,7 @@ public class SetingActivtiy extends TabActivity {
         ido = (GridLayout) findViewById(R.id.Tab1out);
         Scenel = findViewById(R.id.Scenel);
 
+        handler_Scene_loop = new Handler();
         VData Dates = (VData)getApplication();
         Dates.setInClikeoff(false);
         Dates.setSetInOk(false);
@@ -179,7 +186,7 @@ public class SetingActivtiy extends TabActivity {
 
         gestureDetector = new GestureDetector(this, new MyOnGestureListener());
         review = new Handler();
-        MyHandler handler = new MyHandler(this);
+        final MyHandler handler = new MyHandler(this);
         Internets = new MyUdpIo(handler,vdata.Thisip,Mrid1,Msid1);
         new Thread(Internets).start();
         vibrator = (Vibrator)this.getSystemService(VIBRATOR_SERVICE);
@@ -222,6 +229,11 @@ public class SetingActivtiy extends TabActivity {
                 SendCodes(codes.toString());//Set Scene Timer
                // Log.d("Timer::",codes.toString());
                 Toast.makeText(getBaseContext(),"循环间隔："+String.valueOf(time),Toast.LENGTH_SHORT).show();
+                timeout = time ;
+                if (vdata.SceneStart) {
+                    handler_Scene_loop.removeCallbacks(Scene_View_Loop);
+                    handler_Scene_loop.post(Scene_View_Loop);
+                }
                // vdata.ReCode="null";
                 SendStatue();
             }
@@ -275,7 +287,7 @@ public class SetingActivtiy extends TabActivity {
                     codes.append(hexnum);
                 }
                 codes.append("00");
-                Log.d("Save Scence:",codes.toString());
+            //    Log.d("Save Scence:",codes.toString());
                 SendCodes(codes.toString());//Set Scene
                 SendStatue();
 
@@ -295,10 +307,11 @@ public class SetingActivtiy extends TabActivity {
             public void onItemSelected(AdapterView<?> parent, View view,
                                        int position, long id) {
 
-
-                Log.d("this:",String.valueOf(position));
-                for (int i = 0 ;i<16 ; i++){
-                    Log.d("v:",String.valueOf(checkStatu[i].ischeck()));
+                if (Debug.Endebug) {
+                    Log.d("this:", String.valueOf(position));
+                    for (int i = 0; i < 16; i++) {
+                        Log.d("v:", String.valueOf(checkStatu[i].ischeck()));
+                    }
                 }
                /**** V1.4 Code**********
                 StringBuffer codes ;
@@ -371,10 +384,6 @@ public class SetingActivtiy extends TabActivity {
                         e.printStackTrace();
                     }
 
-
-
-
-
                 }
             }
         }.start();
@@ -386,10 +395,10 @@ public class SetingActivtiy extends TabActivity {
                 synchronized (this) {
                     try {
 
-                        wait(100);
+                        wait(300);
                       //  Log.d("Send get changge","sends");
                         Refresh.GetChanngeStatue(vdata.outleng);
-                        wait(100);
+                        wait(300);
                         review.post(Refreshview);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -406,7 +415,7 @@ public class SetingActivtiy extends TabActivity {
                 synchronized (this) {
                     if (msg.what == Mstatue) {
                         try {
-                            wait(500);
+                            wait(300);
 
                              if(vdata.ReCode.equals("null")){
                         Toast.makeText(getBaseContext(),"设备无响应",Toast.LENGTH_SHORT).show();
@@ -428,21 +437,22 @@ public class SetingActivtiy extends TabActivity {
                     if (msg.what == MReview){
                         vdata.ReCode = "55";
                         post(Refreshview);
+
                     }
                 }
 
             }
         })).start();
 
-        if (EnTestView)
-        initView(Video,holder,ViewNum);
-         else
+        if (EnTestView) {
+            initView(Video, holder, ViewNum);
+        }else
         {
             try {
                 sdkinitView(ViewNum);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+           } catch (InterruptedException e) {
+            e.printStackTrace();
+           }
         }
 
     }
@@ -455,12 +465,14 @@ public class SetingActivtiy extends TabActivity {
 
             int Num = Integer.parseInt(vdata.code[3],16)-2;
           //  Log.d("code5",String.valueOf(vdata.code[5]));
-            if (Integer.parseInt(vdata.code[5],16)>vdata.outleng) {
-                Refresh.GetChanngeStatue(vdata.outleng);
+
                 synchronized (this) {
                     try {
+                        if (Integer.parseInt(vdata.code[5],16)>vdata.outleng ||Integer.parseInt(vdata.code[5],16)<0) {
+                        Refresh.GetChanngeStatue(vdata.outleng);
                         wait(300);
-                        if (!(Integer.parseInt(vdata.code[5],16)<0)) {
+                        }
+                        if (!(Integer.parseInt(vdata.code[5],16)<0) && (Integer.parseInt(vdata.code[5],16)<=vdata.outleng ) && !EnTestView) {
                             for (int i = 0; i < Num; i++) {
                                 synchronized (this) {
                                     try {
@@ -499,7 +511,7 @@ public class SetingActivtiy extends TabActivity {
                 }
             }
 
-        }
+
     };
 
 
@@ -508,6 +520,7 @@ public class SetingActivtiy extends TabActivity {
         super.onDestroy();
         vdata.my_ethernet_address= "".toCharArray();
         vdata.LoginOk =false ;
+
         if (!EnTestView) {
             for (int i = 0; i < ViewNum; i++) {
                 netSdk.CloseAlarmChan(i);
@@ -515,11 +528,50 @@ public class SetingActivtiy extends TabActivity {
             }
             netSdk.Cleanup();
         }
+
         Outbid = 0 ;
         EnClose = true ;
         this.finish();
     }
 
+    Runnable Scene_View_Loop = new Runnable() {
+        @Override
+        public void run() {
+            init_Scene_Loop(vdata.Scenenum);
+
+            for(int i =0 ;i<vdata.Scenenum ; i++ ){
+
+                if (Scene_Loop_Index >vdata.Scenenum-1){
+                    Scene_Loop_Index = 0 ;
+                }
+                if (checkStatu[Scene_Loop_Index].ischeck()){
+                    SceneButton b = findViewById(SCENE_BASE+Scene_Loop_Index++);
+                    b.Foucse =true;
+                    b.Onstatu = true;
+                    vdata.IsScene = i;
+                    b.setBackground(getResources().getDrawable(R.drawable.button_shap_on));
+                    b.setTextColor(Color.parseColor("#22ee33"));
+                    Refresh.GetChanngeStatue(vdata.outleng);
+                    SendRefresh();
+                    break;
+                }
+                Scene_Loop_Index++;
+            }
+            handler_Scene_loop.postDelayed(this,timeout*1000);
+        }
+    };
+
+    private  void init_Scene_Loop(int num){
+        for (int i = 0 ; i<num ; i++){
+            SceneButton b = findViewById(SCENE_BASE+i);
+            b.Foucse =false;
+            b.Onstatu = false;
+            vdata.IsScene = 0;
+            b.setBackground(getResources().getDrawable(R.drawable.button_shap2));
+            b.setTextColor(Color.parseColor("#ee2233"));
+
+        }
+    }
     public static class MyHandler extends Handler {
         private WeakReference<TabActivity> reference;
         public MyHandler(TabActivity activity) {
@@ -577,6 +629,34 @@ public class SetingActivtiy extends TabActivity {
                     LinearLayout.LayoutParams lp= new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
                     s.setLayoutParams(lp);
                     l.addView(s);
+                    int   outchang = vdata.outleng-4 ;
+                    int  inChang = Inchangeid - INCHANNGE_BASE ;
+                    StringBuffer codes ;
+                    String leng = "04";
+                    codes=new StringBuffer();
+                    codes.append(getString(R.string.Ncode_Begin));
+                    codes.append(vdata.devaddrid);
+                    codes.append(getString(R.string.Ncode_Order_Cut));
+                    codes.append(leng);
+                    codes.append(vdata.vtype);
+                    if (outchang <16){
+                        String hexnum = Integer.toString(outchang,16);
+                        codes.append("0");
+                        codes.append(hexnum);
+                    }else if (outchang >15){
+                        String hexnum = Integer.toString(outchang,16);
+                        codes.append(hexnum);
+                    }
+                    if (inChang <16){
+                        String hexnum1 = Integer.toString(inChang,16);
+                        codes.append("0");
+                        codes.append(hexnum1);
+                    }else if (inChang >15) {
+                        String hexnum1 = Integer.toString(inChang, 16);
+                        codes.append(hexnum1);
+                    }
+                    codes.append("00");
+                    SendCodes(codes.toString());
 
                     builder.setNegativeButton("退出", new DialogInterface.OnClickListener() {
                         @Override
@@ -627,7 +707,7 @@ public class SetingActivtiy extends TabActivity {
                     layoutParams.width = 576;
                     layoutParams.height = 480;
                     dlg.getWindow().setAttributes(layoutParams);
-
+                    SendStatue();
                     }
 
                  @Override
@@ -710,7 +790,7 @@ public class SetingActivtiy extends TabActivity {
         for (int i = 0; i < insum; i++) {
             final   Mybutton is = new Mybutton(getBaseContext());
             is.setText(i+1+"");
-            @IdRes int ids =600+i ;
+            @IdRes int ids =INCHANNGE_BASE+i ;
             is.setId(ids);
             ((Mybutton) is).SetButtonid(ids);
             ((Mybutton) is).setMyId(i+1);
@@ -940,7 +1020,7 @@ public class SetingActivtiy extends TabActivity {
         for (int i = 0; i < insum; i++) {
             final SceneButton is = new SceneButton(getBaseContext());
             is.setText(i + 1 + "");
-            @android.support.annotation.IdRes int ids = 1000 + i;
+            @android.support.annotation.IdRes int ids = SCENE_BASE + i;
             is.setId(ids);
             is.id = i+1;
             buttonlayot = new LinearLayout(getBaseContext());
@@ -949,8 +1029,8 @@ public class SetingActivtiy extends TabActivity {
             layoutParams.setMargins(0, 0, 0, 0);
 
             GridLayout.LayoutParams param = new GridLayout.LayoutParams(spec(
-                    GridLayout.UNDEFINED, GridLayout.FILL, 1f),
-                    spec(GridLayout.UNDEFINED, GridLayout.FILL, 1f));
+                    GridLayout.UNDEFINED, 1, 1f),
+                    spec(GridLayout.UNDEFINED, 1, 1f));
             param.setMargins(3, 3, 3, 3);
             is.setLayoutParams(layoutParams);
             buttonlayot.setLayoutParams(param);
@@ -1073,7 +1153,6 @@ public class SetingActivtiy extends TabActivity {
     }
 
     public void SceneStart(View view) throws InterruptedException {
-        vdata.SceneStart = true ;
         int Snum = vdata.Scenenum ;
         vibrator.vibrate(70);
         int d1=0 , d2=0;
@@ -1282,15 +1361,32 @@ public class SetingActivtiy extends TabActivity {
         synchronized (this) {
             try {
                 wait(500);
-                codes.delete(0, codes.length());
-                codes.append(getBaseContext().getResources().getString(R.string.Ncode_Begin));
-                codes.append(vdata.devaddrid);
-                codes.append(getBaseContext().getResources().getString(R.string.Ncode_Order_SceneLoop_Timer));
-                codes.append("03");
-                codes.append("00");
-                codes.append("03");
-                codes.append("00");
-                SendCodes(codes.toString());//Set Scene UDF Timer ***3S****
+                if (timeout == 0) {
+                    codes.delete(0, codes.length());
+                    codes.append(getBaseContext().getResources().getString(R.string.Ncode_Begin));
+                    codes.append(vdata.devaddrid);
+                    codes.append(getBaseContext().getResources().getString(R.string.Ncode_Order_SceneLoop_Timer));
+                    codes.append("03");
+                    codes.append("00");
+                    codes.append("03");
+                    codes.append("00");
+                    SendCodes(codes.toString());//Set Scene UDF Timer ***3S****
+                }else {
+                    codes.delete(0, codes.length());
+                    codes.append(getBaseContext().getResources().getString(R.string.Ncode_Begin));
+                    codes.append(vdata.devaddrid);
+                    codes.append(getBaseContext().getResources().getString(R.string.Ncode_Order_SceneLoop_Timer));
+                    codes.append("03");
+                    codes.append("00");
+                   if (timeout < 16 ){
+                       codes.append("0");
+                       codes.append(Integer.toString(timeout,16));
+                   }else {
+                       codes.append(Integer.toString(timeout,16));
+                   }
+                    codes.append("00");
+                    SendCodes(codes.toString());//Set Scene  Timer *******
+                }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -1306,9 +1402,14 @@ public class SetingActivtiy extends TabActivity {
             codes.append("000000");
             SendCodes(codes.toString());//Start Scene Lopper
         }
-        vdata.SceneStart =true ;
+
         Toast.makeText(getBaseContext(),"场景循环启动...",Toast.LENGTH_SHORT).show();
         SendStatue();
+        if (!vdata.SceneStart){
+            vdata.SceneStart =true ;
+            handler_Scene_loop.post(Scene_View_Loop);
+        }
+
     }
     public static   void SendCodes(String codes){
 
@@ -1340,6 +1441,11 @@ public class SetingActivtiy extends TabActivity {
         vdata.SceneStart=false;
         Toast.makeText(getBaseContext(),"场景循环关闭...",Toast.LENGTH_SHORT).show();
         SendStatue();
+        handler_Scene_loop.removeCallbacks(Scene_View_Loop);
+        init_Scene_Loop(vdata.Scenenum);
+        Scene_Loop_Index= 0 ;
+        Refresh.GetChanngeStatue(vdata.outleng);
+        SendRefresh();
     }
 
     private void initView(final MySurfaceView v[] , final SurfaceHolder h[] , final int chn){
@@ -1384,12 +1490,18 @@ public class SetingActivtiy extends TabActivity {
         s.mWndsHolder.vv3.init(this, 2);
         s.mWndsHolder.vv4.init(this, 3);
       //  s.mWndsHolder.vv5.init(this,3);
-        /*
-        final Startdecode s1 =new Startdecode(1);
-        s1.mWndsHolder = new Startdecode.WndsHolder();
-        s1.mWndsHolder.vv1 =findViewById(R.id.vsu);
-        s1.mWndsHolder.vv1.init(this, 0);
-     */
+        String ip[];
+        ip = ParseCode.IpStringToIpArray(vdata.Thisip);
+        ip[3] = String.valueOf(Integer.parseInt(ip[3],10)+1);
+        StringBuffer ips = new StringBuffer();
+        ips.append(ip[0]);
+        ips.append(".");
+        ips.append(ip[1]);
+        ips.append(".");
+        ips.append(ip[2]);
+        ips.append(".");
+        ips.append(ip[3]);
+        final String Viewip = ips.toString();
       threadhalder =  new Thread(){
            @Override
            public void run() {
@@ -1399,7 +1511,7 @@ public class SetingActivtiy extends TabActivity {
                synchronized (this){
                    try {
                        wait(300);
-                       s.Start_sdk();
+                       s.Start_sdk(Viewip);
                      //  wait(300);
                      //  s1.Start_sdk();
                    } catch (InterruptedException e) {
@@ -1432,4 +1544,5 @@ public class SetingActivtiy extends TabActivity {
 
         }
     }
+
 }

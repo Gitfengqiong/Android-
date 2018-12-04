@@ -1,6 +1,7 @@
 package com.example.administrator.muitleconter;
 
 import android.content.Context;
+import android.icu.util.LocaleData;
 import android.util.Log;
 
 //import static com.example.administrator.muitleconter.MainActivity.vdate;
@@ -536,6 +537,31 @@ public class ParseCode {
            netbyte.append(Integer.toString(num,16));
        }
        return netbyte.toString();
+    }
+
+    public static  String[] IpStringToIpArray(String IP){
+         String IPSpilt[] = new String[4];
+         StringBuffer s= new StringBuffer();
+         String sub ;
+        for (int i=0 ,j =0 ; i<IP.length() ;){
+
+          sub = IP.substring(i,++i);
+          if (!sub.equals(".")&&!sub.equals("null")){
+              s.append(sub);
+              if (i >= IP.length())
+              {
+                   IPSpilt[j++] = s.toString();
+                  s.delete(0,s.length());
+              }
+
+
+          }else {
+
+              IPSpilt[j++] = s.toString();
+              s.delete(0,s.length());
+          }
+         }
+         return IPSpilt ;
     }
 
  }
