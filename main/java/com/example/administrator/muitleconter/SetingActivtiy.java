@@ -704,8 +704,8 @@ public class SetingActivtiy extends TabActivity {
                     dlg.setView(view,0,0,0,0);
                     dlg.show();
                     WindowManager.LayoutParams layoutParams = dlg.getWindow().getAttributes();
-                    layoutParams.width = 576;
-                    layoutParams.height = 480;
+                    layoutParams.width = 720;
+                    layoutParams.height = 576;
                     dlg.getWindow().setAttributes(layoutParams);
                     SendStatue();
                     }
