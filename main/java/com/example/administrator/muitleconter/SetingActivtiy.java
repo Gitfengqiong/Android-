@@ -1,6 +1,5 @@
 package com.example.administrator.muitleconter;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.TabActivity;
 import android.content.DialogInterface;
@@ -26,28 +25,22 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.Spinner;
-import android.widget.Switch;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 import android.widget.TextView;
 import android.widget.Toast;
 
 
-import com.xm.NetSdk;
-import com.xm.javaclass.H264_DVR_DEVICEINFO;
 import com.xm.video.MySurfaceView;
 
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.security.acl.Group;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import static android.widget.GridLayout.spec;
@@ -1474,10 +1467,6 @@ public class SetingActivtiy extends TabActivity {
 
     private void  sdkinitView(final int chn) throws InterruptedException {
 
-      //  mWndsHolder.vv1.initAdd(new int[] { R.drawable.wnd_normal, R.drawable.wnd_selected });
-      //  mWndsHolder.vv2.initAdd(new int[] { R.drawable.w, R.drawable.wnd_add_selected });
-       // mWndsHolder.vv3.initAdd(new int[] { R.drawable.wnd_add_normal, R.drawable.wnd_add_selected });
-      //  mWndsHolder.vv4.initAdd(new int[] { R.drawable.wnd_add_normal, R.drawable.wnd_add_selected });
         final Startdecode s = new Startdecode(chn);
         s.mWndsHolder = new Startdecode.WndsHolder();
         s.mWndsHolder.vv1 =findViewById(R.id.v1);
@@ -1490,6 +1479,15 @@ public class SetingActivtiy extends TabActivity {
         s.mWndsHolder.vv3.init(this, 2);
         s.mWndsHolder.vv4.init(this, 3);
       //  s.mWndsHolder.vv5.init(this,3);
+
+        s.mWndsHolder.vv1.initAdd(new int[] { R.mipmap.waring,R.mipmap.waring });
+        s.mWndsHolder.vv2.initAdd(new int[] {R.mipmap.waring,R.mipmap.waring});
+        s.mWndsHolder.vv3.initAdd(new int[] { R.mipmap.waring, R.mipmap.waring});
+        s.mWndsHolder.vv4.initAdd(new int[] { R.mipmap.waring, R.mipmap.waring});
+        s.mWndsHolder.vv1.setShowAdd(true);
+        s.mWndsHolder.vv2.setShowAdd(true);
+        s.mWndsHolder.vv3.setShowAdd(true);
+        s.mWndsHolder.vv4.setShowAdd(true);
         String ip[];
         ip = ParseCode.IpStringToIpArray(vdata.Thisip);
         ip[3] = String.valueOf(Integer.parseInt(ip[3],10)+1);

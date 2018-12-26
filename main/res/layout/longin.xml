@@ -117,6 +117,7 @@
                     android:onClick="Links"
                     android:text="确认&#10;OK" />
 
+<!--
                 <Button
                     android:id="@+id/findec"
                     android:layout_width="0dp"
@@ -125,6 +126,7 @@
                     android:layout_weight="1"
                     android:background="@drawable/button_shap1"
                     android:text="预监&#10;Find" />
+                    -->
             </LinearLayout>
         </LinearLayout>
 

@@ -79,11 +79,14 @@ public class MainActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.longin);
+        /********
+         * 搜索解码器***目前无法搜索到，暂时停用功能
         for (int i=0 ;i<20 ;i++) {
             encoders[i] = new SearchDeviceInfo();
             //创建30个IP参数单
         }
         encoders[0].HostIP = "NUll";
+
         Button findec = findViewById(R.id.findec);
         findec.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -204,6 +207,7 @@ public class MainActivity extends Activity {
 
             }
         });
+         */
         //Cheek InterNet
        if(!CheekInternet.isNetworkAvalible(this))
            CheekInternet.checkNetwork(this);
