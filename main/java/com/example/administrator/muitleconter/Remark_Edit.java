@@ -2,12 +2,9 @@ package com.example.administrator.muitleconter;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.transition.Scene;
-import android.util.Log;
 import android.widget.EditText;
 
 import static com.example.administrator.muitleconter.MainActivity.SceneRemark;
-import static com.example.administrator.muitleconter.MainActivity.config;
 import static com.example.administrator.muitleconter.MainActivity.config_in;
 import static com.example.administrator.muitleconter.MainActivity.config_out;
 import static com.example.administrator.muitleconter.MainActivity.vdate;
@@ -31,14 +28,14 @@ public class Remark_Edit extends EditText {
             scene.Remark = getText().toString();
             scene.setText(scene.getText());
             SceneRemark[Buttonid-1000]=this.getText().toString();
-            ParseCode.SaveSceneRemark(FileNames);
+            MyUdpIo.ParseCode.SaveSceneRemark(FileNames);
         }
 
         if (getText().equals("null")){
             scene.Remark = "";
             scene.setText(scene.getText());
             SceneRemark[Buttonid-1000]="null";
-            ParseCode.SaveSceneRemark(FileNames);
+            MyUdpIo.ParseCode.SaveSceneRemark(FileNames);
         }
         this.setText("");
     }
@@ -49,14 +46,14 @@ public class Remark_Edit extends EditText {
             scene.Remark = getText().toString();
             scene.setText(scene.getText());
             SceneRemark[Buttonid-1000]=this.getText().toString();
-            ParseCode.SaveSceneRemark(FileNames);
+            MyUdpIo.ParseCode.SaveSceneRemark(FileNames);
         }
 
         if (getText().equals("null")){
             scene.Remark = "";
             scene.setText(scene.getText());
             SceneRemark[Buttonid-1000]="null";
-            ParseCode.SaveSceneRemark(FileNames);
+            MyUdpIo.ParseCode.SaveSceneRemark(FileNames);
         }
         this.setText("");
     }
@@ -68,14 +65,14 @@ public class Remark_Edit extends EditText {
             scene.Remark = getText().toString();
             scene.setText(scene.getText());
             ChanngRemark_in[Buttonid-IdBase]=this.getText().toString();
-            ParseCode.SaveChanngeRemark(InFileNames,ChanngRemark_in,config_in,vdate.inleng);
+            MyUdpIo.ParseCode.SaveChanngeRemark(InFileNames,ChanngRemark_in,config_in,vdate.inleng);
         }
 
         if (getText().equals("null")){
             scene.Remark = "";
             scene.setText(scene.getText());
             ChanngRemark_in[Buttonid-IdBase]="null";
-            ParseCode.SaveChanngeRemark(InFileNames,ChanngRemark_in,config_in,vdate.inleng);
+            MyUdpIo.ParseCode.SaveChanngeRemark(InFileNames,ChanngRemark_in,config_in,vdate.inleng);
         }
         this.setText("");
     }
@@ -86,14 +83,14 @@ public class Remark_Edit extends EditText {
             scene.Remark = getText().toString();
             scene.setText(scene.getText());
             ChanngRemark_in[Buttonid-IdBase]=this.getText().toString();
-            ParseCode.SaveChanngeRemark(InFileNames,ChanngRemark_in,config_in,vdate.inleng);
+            MyUdpIo.ParseCode.SaveChanngeRemark(InFileNames,ChanngRemark_in,config_in,vdate.inleng);
         }
 
         if (getText().equals("null")){
             scene.Remark = "";
             scene.setText(scene.getText());
             ChanngRemark_in[Buttonid-IdBase]="null";
-            ParseCode.SaveChanngeRemark(InFileNames,ChanngRemark_in,config_in,vdate.inleng);
+            MyUdpIo.ParseCode.SaveChanngeRemark(InFileNames,ChanngRemark_in,config_in,vdate.inleng);
         }
         this.setText("");
     }
@@ -104,14 +101,14 @@ public class Remark_Edit extends EditText {
             scene.Remark = getText().toString();
             scene.setText(scene.getText());
             ChanngeRemark_out[Buttonid-IdBase]=this.getText().toString();
-            ParseCode.SaveChanngeRemark(OutFileNames,ChanngeRemark_out,config_out,vdate.outleng);
+            MyUdpIo.ParseCode.SaveChanngeRemark(OutFileNames,ChanngeRemark_out,config_out,vdate.outleng);
         }
 
         if (getText().equals("null")){
             scene.Remark = "";
             scene.setText(scene.getText());
             ChanngeRemark_out[Buttonid-IdBase]="null";
-            ParseCode.SaveChanngeRemark(OutFileNames,ChanngeRemark_out,config_out,vdate.outleng);
+            MyUdpIo.ParseCode.SaveChanngeRemark(OutFileNames,ChanngeRemark_out,config_out,vdate.outleng);
         }
         this.setText("");
     }
@@ -123,14 +120,14 @@ public class Remark_Edit extends EditText {
             scene.Remark = getText().toString();
             scene.setText(scene.getText());
             ChanngeRemark_out[Buttonid-IdBase]=this.getText().toString();
-            ParseCode.SaveChanngeRemark(OutFileNames,ChanngeRemark_out,config_out,vdate.outleng);
+            MyUdpIo.ParseCode.SaveChanngeRemark(OutFileNames,ChanngeRemark_out,config_out,vdate.outleng);
         }
 
         if (getText().equals("null")){
             scene.Remark = "";
             scene.setText(scene.getText());
             ChanngeRemark_out[Buttonid-IdBase]="null";
-            ParseCode.SaveChanngeRemark(OutFileNames,ChanngeRemark_out,config_out,vdate.outleng);
+            MyUdpIo.ParseCode.SaveChanngeRemark(OutFileNames,ChanngeRemark_out,config_out,vdate.outleng);
         }
         this.setText("");
     }

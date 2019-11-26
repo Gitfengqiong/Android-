@@ -2,6 +2,7 @@ package com.example.administrator.muitleconter;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.TabActivity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.Rect;
@@ -134,10 +135,10 @@ public class SetingActivtiy extends TabActivity {
         for (int i = 0 ; i<vdata.outleng ; i++){
             ChanngeRemark_out[i] = "null";
         }
-        FileNames =  this.getFilesDir().getPath()+String.valueOf(vdata.my_ethernet_address)+".cfg";
+        FileNames = getApplicationContext().getPackageResourcePath()+String.valueOf(vdata.my_ethernet_address)+".cfg";
         InFileNames =  this.getFilesDir().getPath()+String.valueOf(vdata.my_ethernet_address)+"In.cfg";
         OutFileNames =  this.getFilesDir().getPath()+String.valueOf(vdata.my_ethernet_address)+"Out.cfg";
-
+        Log.d("data:",FileNames);
         config = new File(FileNames);
         if(!config.exists())
         {
@@ -145,7 +146,9 @@ public class SetingActivtiy extends TabActivity {
                 //文件不存在，就创建一个新文件
                 config.createNewFile();
                  //  System.out.println("文件已经创建了");
-                Toast.makeText(this,"New Device",Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"New Device  " ,Toast.LENGTH_SHORT).show();
+
+
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -346,7 +349,7 @@ public class SetingActivtiy extends TabActivity {
             public void run() {
                 super.run();
                 synchronized (this) {
-                    ParseCode.parseSceneRemark(FileNames);
+                    MyUdpIo.ParseCode.parseSceneRemark(FileNames);
                     for (int i = 0; i < vdata.Scenenum; i++) {
                         SceneButton button = findViewById(1000 + i);
                         if (!SceneRemark[i].equals("null") && !SceneRemark[i].equals("")) {
@@ -356,7 +359,7 @@ public class SetingActivtiy extends TabActivity {
                     }
                     try {
                         wait(10);
-                        ParseCode.parseChanngeRemark(InFileNames, ChanngRemark_in);
+                        MyUdpIo.ParseCode.parseChanngeRemark(InFileNames, ChanngRemark_in);
                         for (int i = 0; i < vdata.inleng; i++) {
                             Mybutton button = findViewById(600 + i);
                             if (!ChanngRemark_in[i].equals("null") && !ChanngRemark_in[i].equals("")) {
@@ -365,7 +368,7 @@ public class SetingActivtiy extends TabActivity {
                         }
 
                         wait(10);
-                        ParseCode.parseChanngeRemark(OutFileNames, ChanngeRemark_out);
+                        MyUdpIo.ParseCode.parseChanngeRemark(OutFileNames, ChanngeRemark_out);
                         for (int i = 0; i < vdata.outleng; i++) {
                             Mybutton button = findViewById(800 + i);
                             if (!ChanngeRemark_out[i].equals("null") && !ChanngeRemark_out[i].equals("")) {
@@ -582,7 +585,7 @@ public class SetingActivtiy extends TabActivity {
                      //   Toast.makeText(,msg.obj.toString(),Toast.LENGTH_LONG);
                         String data = msg.obj.toString();
                         vdata.LoginOk = true;
-                        ParseCode.Parsecode(data);
+                        MyUdpIo.ParseCode.Parsecode(data);
                         vdata.ReCode = vdata.code[4];
                       //  Log.d("Re",vdata.ReCode);
                         break;
@@ -1489,7 +1492,7 @@ public class SetingActivtiy extends TabActivity {
         s.mWndsHolder.vv3.setShowAdd(true);
         s.mWndsHolder.vv4.setShowAdd(true);
         String ip[];
-        ip = ParseCode.IpStringToIpArray(vdata.Thisip);
+        ip = MyUdpIo.ParseCode.IpStringToIpArray(vdata.Thisip);
         ip[3] = String.valueOf(Integer.parseInt(ip[3],10)+1);
         StringBuffer ips = new StringBuffer();
         ips.append(ip[0]);

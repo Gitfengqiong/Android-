@@ -334,6 +334,7 @@
                                             android:layout_rowWeight="1"
                                             android:layout_columnWeight="1"
                                             android:onClick="FullView"
+                                            android:background="@drawable/shap_over"
                                             />
                                         <com.xm.video.MySurfaceView
                                             android:id="@+id/v2"
@@ -342,6 +343,7 @@
                                             android:layout_rowWeight="1"
                                             android:layout_columnWeight="1"
                                             android:onClick="FullView"
+                                            android:background="@drawable/shap_over"
                                             />
                                         <com.xm.video.MySurfaceView
                                             android:id="@+id/v3"
@@ -349,7 +351,8 @@
                                             android:layout_width="0dp"
                                             android:onClick="FullView"
                                             android:layout_columnWeight="1"
-                                            android:layout_rowWeight="1" />
+                                            android:layout_rowWeight="1"
+                                            android:background="@drawable/shap_over"/>
                                         <com.xm.video.MySurfaceView
                                             android:id="@+id/v4"
                                             android:layout_height="0dp"
@@ -357,6 +360,7 @@
                                             android:layout_rowWeight="1"
                                             android:layout_columnWeight="1"
                                             android:onClick="FullView"
+                                            android:background="@drawable/shap_over"
                                              />
 
 

@@ -10,33 +10,22 @@ package com.example.administrator.muitleconter;
         import android.app.AlertDialog;
         import android.os.Bundle;
         import android.text.method.DigitsKeyListener;
-        import android.util.DisplayMetrics;
-        import android.util.Log;
         import android.view.LayoutInflater;
         import android.view.View;
         import android.widget.AdapterView;
-        import android.widget.Button;
         import android.widget.EditText;
         import android.widget.ListView;
         import android.widget.SimpleAdapter;
         import android.widget.Spinner;
         import android.widget.Toast;
 
-        import com.xm.DevInfo;
         import com.xm.GlobalData;
         import com.xm.MyConfig;
         import com.xm.NetSdk;
         import com.xm.SearchDeviceInfo;
-        import com.xm.dialog.RadarSearchDevicesDlg;
-        import com.xm.net.NetConfig;
         import com.xm.utils.MyWifiManager;
-        import com.xm.dialog.RadarSearchDevicesDlg.OnMySearchListener;
-        import com.xm.dialog.RadarSearchDevicesDlg.onMyCancelListener;
-        import com.xm.dialog.RadarSearchDevicesDlg.onMyDismissListener;
-        import com.xm.dialog.RadarSearchDevicesDlg.onMySelectDevListener;
 
         import java.io.File;
-        import java.io.UnsupportedEncodingException;
         import java.lang.ref.WeakReference;
         import java.util.ArrayList;
         import java.util.HashMap;
@@ -415,19 +404,19 @@ public class MainActivity extends Activity {
                 builder.setPositiveButton("设置", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String ip1 = ParseCode.parseIpSlice(IP1.getText().toString());
-                        String ip2 = ParseCode.parseIpSlice(IP2.getText().toString());
-                        String ip3 = ParseCode.parseIpSlice(IP3.getText().toString());
-                        String ip4 = ParseCode.parseIpSlice(IP4.getText().toString());
-                        String gw1 = ParseCode.parseIpSlice(Gw1.getText().toString());
-                        String gw2 = ParseCode.parseIpSlice(Gw2.getText().toString());
-                        String gw3 = ParseCode.parseIpSlice(Gw3.getText().toString());
-                        String gw4 = ParseCode.parseIpSlice(Gw4.getText().toString());
-                        String mk1 = ParseCode.parseIpSlice(mask.getText().toString());
-                        String mk2 = ParseCode.parseIpSlice(mask2.getText().toString());
-                        String mk3 = ParseCode.parseIpSlice(mask3.getText().toString());
-                        String mk4 = ParseCode.parseIpSlice(mask4.getText().toString());
-                        String id = ParseCode.parseIpSlice(Id.getText().toString());
+                        String ip1 = MyUdpIo.ParseCode.parseIpSlice(IP1.getText().toString());
+                        String ip2 = MyUdpIo.ParseCode.parseIpSlice(IP2.getText().toString());
+                        String ip3 = MyUdpIo.ParseCode.parseIpSlice(IP3.getText().toString());
+                        String ip4 = MyUdpIo.ParseCode.parseIpSlice(IP4.getText().toString());
+                        String gw1 = MyUdpIo.ParseCode.parseIpSlice(Gw1.getText().toString());
+                        String gw2 = MyUdpIo.ParseCode.parseIpSlice(Gw2.getText().toString());
+                        String gw3 = MyUdpIo.ParseCode.parseIpSlice(Gw3.getText().toString());
+                        String gw4 = MyUdpIo.ParseCode.parseIpSlice(Gw4.getText().toString());
+                        String mk1 = MyUdpIo.ParseCode.parseIpSlice(mask.getText().toString());
+                        String mk2 = MyUdpIo.ParseCode.parseIpSlice(mask2.getText().toString());
+                        String mk3 = MyUdpIo.ParseCode.parseIpSlice(mask3.getText().toString());
+                        String mk4 = MyUdpIo.ParseCode.parseIpSlice(mask4.getText().toString());
+                        String id = MyUdpIo.ParseCode.parseIpSlice(Id.getText().toString());
                         if (ip1.equals("erro")||ip2.equals("erro")||ip3.equals("erro")||ip4.equals("erro"))
                         {
                             Toast.makeText(MainActivity.this, "IP地址错误", Toast.LENGTH_SHORT).show();
@@ -444,8 +433,8 @@ public class MainActivity extends Activity {
                             Message msg =new  Message();
                             msg.what = MMsid;
                             msg.obj = "EFFE0102"+mac.getText().toString()+ip1+ip2+ip3+ip4+iPlist[arg2].multicast_ip_address+
-                                    iPlist[arg2].host_ip_address +gw1+gw2+gw3+gw4+mk1+mk2+mk3+mk4+ParseCode.ByteSwap(Integer.toString(Integer.parseInt(Port.getText().toString()),16)) +
-                                    ParseCode.ByteSwap(iPlist[arg2].m_HostPort) +iPlist[arg2].m_NetMode+ bs[0]+id+iPlist[arg2].DEVICE_name+
+                                    iPlist[arg2].host_ip_address +gw1+gw2+gw3+gw4+mk1+mk2+mk3+mk4+MyUdpIo.ParseCode.ByteSwap(Integer.toString(Integer.parseInt(Port.getText().toString()),16)) +
+                                    MyUdpIo.ParseCode.ByteSwap(iPlist[arg2].m_HostPort) +iPlist[arg2].m_NetMode+ bs[0]+id+iPlist[arg2].DEVICE_name+
                                     iPlist[arg2].DECICE_model+ iPlist[arg2].m_IPMode+ iPlist[arg2].password+ iPlist[arg2].identify
                                     + iPlist[arg2].dns_ip;
 
@@ -530,7 +519,7 @@ public class MainActivity extends Activity {
           //  Log.d("find ip",iPlist[ipIndex-1].m_HostPort);
           //  CreateListView();
             String s= "BA0103A001130F0F7D";
-            ParseCode.Parsecode(s);
+            MyUdpIo.ParseCode.Parsecode(s);
             vdate.LoginOk =true;
              Toast.makeText(this,"演示模式",Toast.LENGTH_LONG).show();
              EnTestView = true ;
@@ -686,7 +675,7 @@ public class MainActivity extends Activity {
                     {
                       //  Log.d("Main收到数据", msg.obj.toString());
                         String data = msg.obj.toString();
-                        ParseCode.Parsecode(data);
+                        MyUdpIo.ParseCode.Parsecode(data);
                        vdate.LoginOk = true;
                         break;
                     }
@@ -695,7 +684,7 @@ public class MainActivity extends Activity {
                     {
                        // Log.d("收到多播返回","");
                        String  debugs = msg.obj.toString();
-                       ParseCode.ParseMultiCodes(debugs);
+                       MyUdpIo.ParseCode.ParseMultiCodes(debugs);
                         CreateListView();
                         break;
                     }

@@ -17,7 +17,7 @@ public class VData extends Application {
     public boolean LoginOk = false;
     public String ReCode = "null";
     public String devaddrid = "01";
-    public String vtype = "A0";
+    public String vtype = "AF";
     public String cleng;
     public int inleng, outleng;
     public String Thisip;

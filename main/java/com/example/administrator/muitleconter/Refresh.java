@@ -1,13 +1,9 @@
 package com.example.administrator.muitleconter;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Build;
 import android.os.Message;
 import android.support.annotation.RequiresApi;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.LinearLayout;
 
 import static com.example.administrator.muitleconter.SetingActivtiy.Internets;
 import static com.example.administrator.muitleconter.SetingActivtiy.Msid1;
@@ -40,10 +36,10 @@ public class Refresh {
         codes.append("BA");
         codes.append(vdata.devaddrid);
         codes.append("02");
-        codes.append(ParseCode.IntToNetByte(MaxNum+2));
+        codes.append(MyUdpIo.ParseCode.IntToNetByte(MaxNum+2));
         codes.append(vdata.vtype);
         for (int i = 0 ; i<MaxNum ; i++){
-            codes.append(ParseCode.IntToNetByte(i));
+            codes.append(MyUdpIo.ParseCode.IntToNetByte(i));
         }
         codes.append("00");
         SendCodes(codes.toString());
